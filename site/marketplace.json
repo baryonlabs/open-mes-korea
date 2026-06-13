@@ -1,0 +1,59 @@
+{
+  "schema_version": "0.1",
+  "catalog_status": "roadmap",
+  "disclaimer": "No installable extension packages have been released yet.",
+  "project": "Open MES Korea",
+  "extensions": [
+    {
+      "id": "broadway_ingest",
+      "name": "Broadway Ingest",
+      "category": "data",
+      "status": "designed",
+      "summary": "HTTP event validation, idempotency, back-pressure, and TimescaleDB ingestion.",
+      "requires": ["Broadway", "TimescaleDB"]
+    },
+    {
+      "id": "media_collector",
+      "name": "Media Collector",
+      "category": "data",
+      "status": "designed",
+      "summary": "Collect equipment audio, images, and video from NAS paths into object storage.",
+      "requires": ["MinIO or S3"]
+    },
+    {
+      "id": "predictive_maintenance",
+      "name": "Predictive Maintenance",
+      "category": "ai",
+      "status": "planned",
+      "summary": "Equipment anomaly scoring and maintenance recommendation candidates."
+    },
+    {
+      "id": "oee_live_monitor",
+      "name": "OEE & Live Monitor",
+      "category": "operations",
+      "status": "planned",
+      "summary": "Equipment utilization, downtime reasons, and live production dashboards."
+    },
+    {
+      "id": "erp_connector",
+      "name": "ERP Connector",
+      "category": "integration",
+      "status": "planned",
+      "summary": "Synchronize master data, work orders, and production results through explicit system boundaries."
+    },
+    {
+      "id": "vision_inspection",
+      "name": "Vision Inspection",
+      "category": "ai",
+      "status": "planned",
+      "summary": "Connect visual, assembly, and dimensional inspection candidates to quality workflows."
+    },
+    {
+      "id": "manufacturing_llm",
+      "name": "Manufacturing LLM",
+      "category": "ai",
+      "status": "planned",
+      "summary": "Permission-aware retrieval over approved manuals and work instructions."
+    }
+  ]
+}

@@ -1,8 +1,9 @@
 const translations = {
   ko: {
     skip: "본문으로 이동", navWhy: "프로젝트", navCore: "핵심 기능", navAi: "AI 모듈",
-    navArchitecture: "아키텍처", navRoadmap: "로드맵", navPrompt: "도입 검증", language: "언어",
-    heroStatus: "설계 및 초기 구현 단계", heroTitle1: "제조 현장을 이해하는",
+    navMarketplace: "마켓플레이스", navSdk: "SDK", navAdoption: "도입 가이드", navContact: "문의",
+    navArchitecture: "아키텍처", navRoadmap: "로드맵", navPrompt: "LLM 검증", language: "언어",
+    heroStatus: "설계 및 초기 구현 단계", heroTitle1: "제조 현장을 위한",
     heroTitle2: "작고 단단한 MES",
     heroDescription: "한국 제조 현장의 실제 흐름에서 출발해 다양한 국가, 언어, 업종으로 확장 가능한 오픈소스 제조 실행 시스템을 만듭니다.",
     viewGithub: "GitHub에서 보기", readVision: "비전 읽기",
@@ -45,6 +46,38 @@ const translations = {
     aiSafetyTitle: "작업자 안전", aiSafetyBody: "보호구, 위험구역과 위험 행동 감지 후보",
     aiLlmTitle: "제조 LLM", aiLlmBody: "매뉴얼, 작업표준 검색과 오류 대응 보조",
     safetyNoteTitle: "고위험 기능 원칙", safetyNoteBody: "설비 제어, 품질 판정과 안전 경보는 AI가 단독 확정하지 않습니다. 현장 검증, fail-safe, 사람의 승인과 감사 로그를 요구합니다.",
+    marketplaceLabel: "EXTENSION MARKETPLACE", marketplaceTitle: "코어는 작게,<br>현장 기능은 모듈로.",
+    marketplaceDescription: "업종, 설비와 공장마다 다른 요구를 코어에 넣지 않고 설치 가능한 확장 모듈로 제공합니다. 현재는 로드맵 카탈로그이며 패키지는 아직 공개되지 않았습니다.",
+    marketplaceCatalog: "JSON 카탈로그 보기", marketAll: "전체", marketData: "데이터 수집",
+    marketOperations: "생산 운영", marketAi: "AI", marketIntegration: "연동",
+    statusDesigned: "설계 완료", statusPlanned: "계획",
+    marketIngestTitle: "Broadway Ingest", marketIngestBody: "HTTP 이벤트 검증, 중복 제거, 배압과 TimescaleDB 적재",
+    marketMediaTitle: "Media Collector", marketMediaBody: "설비 소음, 이미지와 영상을 NAS에서 수집해 object storage로 보관",
+    marketMaintenanceTitle: "Predictive Maintenance", marketMaintenanceBody: "시계열과 소음 특징 기반 설비 이상 및 정비 시점 후보",
+    marketOeeTitle: "OEE & Live Monitor", marketOeeBody: "설비 가동률, 정지 원인과 실시간 생산현황 대시보드",
+    marketErpTitle: "ERP Connector", marketErpBody: "기준정보, 작업지시와 생산실적을 ERP 경계에 맞춰 동기화",
+    marketVisionTitle: "Vision Inspection", marketVisionBody: "외관, 조립과 치수 검사 결과를 품질 후보 데이터로 연결",
+    marketLlmTitle: "Manufacturing LLM", marketLlmBody: "승인된 매뉴얼과 작업표준을 검색하는 권한 기반 현장 도우미",
+    marketRequestTitle: "필요한 모듈이 있나요?", marketRequestBody: "코어 변경보다 독립 확장이 적합한지 먼저 함께 검토합니다.",
+    marketRequestAction: "모듈 제안하기",
+    sdkLabel: "EXTENSION SDK", sdkTitle: "MES 코어를 건드리지 않고<br>현장 기능을 연결합니다.",
+    sdkDescription: "SDK는 확장이 코어 내부 테이블에 직접 의존하지 않도록 API, 이벤트와 명시적 계약을 제공합니다. 현재 아래 계약을 설계하는 단계이며 배포 가능한 SDK 패키지는 아직 없습니다.",
+    sdkApiTitle: "REST & Context API", sdkApiBody: "권한과 사이트 경계를 적용한 읽기·쓰기 인터페이스",
+    sdkEventTitle: "Event & Outbox", sdkEventBody: "작업지시, 실적, LOT와 품질 이벤트 구독",
+    sdkConnectorTitle: "Connector SDK", sdkConnectorBody: "HTTP, MQTT, OPC UA와 Modbus edge adapter",
+    sdkUiTitle: "UI Extension Points", sdkUiBody: "메뉴, 화면, 대시보드와 다국어 리소스 등록",
+    sdkSafetyTitle: "Permission & Audit", sdkSafetyBody: "권한 선언, 승인 정책과 모든 중요 액션 감사",
+    sdkPackageTitle: "Package Manifest", sdkPackageBody: "버전, 호환성, 권한과 설정을 명시하는 모듈 메타데이터",
+    sdkArchitecture: "아키텍처 보기", sdkIot: "Connector 전략", sdkStatus: "STATUS", sdkDraft: "계약 설계 단계",
+    adoptionLabel: "ADOPTION GUIDES", adoptionTitle: "설치보다 먼저,<br>공장의 준비도를 확인합니다.",
+    adoptionDescription: "기능 목록만 보고 도입하지 않도록 생산 흐름, 기준정보, LOT, 설비 연결과 운영 위험을 순서대로 검토하는 공개 문서입니다.",
+    guideFitTitle: "도입 적합성", guideFitBody: "우리 공장에 MES가 필요한지 빠르게 판단",
+    guideDiscoveryTitle: "현장 업무 조사", guideDiscoveryBody: "작업지시, 공정, 품질과 LOT 흐름 조사",
+    guideDataTitle: "데이터 준비", guideDataBody: "품목, BOM, 공정과 불량 코드 준비도 확인",
+    guideIotTitle: "설비 연결", guideIotBody: "바코드, PLC, 센서와 네트워크 점검",
+    guideDecisionTitle: "도입 의사결정", guideDecisionBody: "도입, PoC, 부분 도입 또는 보류 판정",
+    guideRiskTitle: "리스크와 대응", guideRiskBody: "데이터, 현장 입력, 연동과 보안 위험 확인",
+    routeAssess: "적합성 판단", routeDiscover: "현장·데이터 조사", routePoc: "한 라인 PoC", routeExpand: "검증 후 확장",
     roadmapLabel: "ROADMAP", roadmapTitle: "현재는 기반을<br>단단하게 만드는 단계입니다.",
     roadmapDescription: "구현과 현장 검증 결과에 따라 순서를 조정합니다. 기능 수보다 실제로 작동하는 생산 흐름을 우선합니다.",
     phase0: "비전과 아키텍처", phase1: "MES Core", phase2: "LOT Traceability",
@@ -55,15 +88,28 @@ const translations = {
     promptPoint1: "코어·확장·외부 시스템 책임 분류", promptPoint2: "서버·저장장치·네트워크 초안",
     promptPoint3: "AI 모듈 가치·데이터·위험 평가", promptPoint4: "30/60/90일 PoC 실행 계획",
     openPrompt: "전체 프롬프트 열기", copyPrompt: "프롬프트 복사", copiedPrompt: "복사 완료",
+    contactLabel: "ADOPTION & CONTACT", contactTitle: "도입 검토와 기술 문의를<br>보내주세요.",
+    contactDescription: "공장 현황과 해결하려는 문제를 알려주시면 도입 적합성, 데이터 수집 시작점과 필요한 확장 모듈을 검토할 수 있습니다.",
+    contactPoint1: "도입·PoC 범위 검토", contactPoint2: "ERP·설비·데이터 연동 문의", contactPoint3: "확장 모듈·SDK 제안",
+    formName: "이름", formEmail: "이메일", formPhone: "전화번호", formType: "문의 유형",
+    formTypePlaceholder: "선택해 주세요", formTypeAdoption: "도입·PoC 검토", formTypeIntegration: "ERP·설비 연동",
+    formTypeExtension: "마켓플레이스·SDK", formTypeContribution: "오픈소스 기여", formTypeOther: "기타 문의",
+    formSubject: "제목", formMessage: "메시지",
+    formNotice: "문의 처리를 위해 입력한 연락처와 메시지가 Form2AI2Email 서비스로 전송됩니다.",
+    formSubmit: "문의 보내기", formSending: "전송 중", formSuccess: "문의가 정상적으로 전송되었습니다.",
+    formFailure: "전송하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    errorRequired: "필수 입력 항목입니다.", errorEmail: "올바른 이메일 주소를 입력해 주세요.",
+    errorPhone: "올바른 전화번호를 입력해 주세요.",
     ctaLabel: "BUILD WITH US", ctaTitle: "제조 현장에 필요한<br>최소 MES를 함께 만듭니다.",
     ctaDescription: "제조 실무, Elixir/Phoenix, PostgreSQL, 현장 UX, 설비 연동과 다국어 경험을 가진 기여자를 찾고 있습니다.",
     joinProject: "프로젝트 참여하기", contributionGuide: "기여 가이드",
     footerStatus: "Open source · Early implementation", docs: "문서", contribute: "기여"
   },
   en: {
-    skip: "Skip to content", navWhy: "Project", navCore: "Core", navAi: "AI modules", navArchitecture: "Architecture",
-    navRoadmap: "Roadmap", navPrompt: "Adoption review", language: "Language", heroStatus: "Design and early implementation",
-    heroTitle1: "A manufacturing-aware", heroTitle2: "small, robust MES",
+    skip: "Skip to content", navWhy: "Project", navCore: "Core", navAi: "AI modules",
+    navMarketplace: "Marketplace", navSdk: "SDK", navAdoption: "Adoption guides", navContact: "Contact",
+    navArchitecture: "Architecture", navRoadmap: "Roadmap", navPrompt: "LLM review", language: "Language", heroStatus: "Design and early implementation",
+    heroTitle1: "Built for manufacturing", heroTitle2: "a small, robust MES",
     heroDescription: "An open-source manufacturing execution system built from real Korean shop-floor workflows and designed to extend across countries, languages, and industries.",
     viewGithub: "View on GitHub", readVision: "Read the vision", principleSmall: "Small core",
     principleTrace: "Trace everything", principleExtend: "Extend deliberately",
@@ -104,6 +150,38 @@ const translations = {
     aiSafetyTitle: "Worker safety", aiSafetyBody: "PPE, restricted-area, and hazardous-behavior candidates",
     aiLlmTitle: "Manufacturing LLM", aiLlmBody: "Manual search, work instructions, and troubleshooting assistance",
     safetyNoteTitle: "High-risk AI principle", safetyNoteBody: "AI does not independently finalize equipment control, quality disposition, or safety alarms. Site validation, fail-safe behavior, human approval, and audit records are required.",
+    marketplaceLabel: "EXTENSION MARKETPLACE", marketplaceTitle: "Keep the core small.<br>Add factory needs as modules.",
+    marketplaceDescription: "Industry, equipment, and site-specific needs belong in installable extensions instead of the core. This is currently a roadmap catalog; no packages have been released yet.",
+    marketplaceCatalog: "View JSON catalog", marketAll: "All", marketData: "Data collection",
+    marketOperations: "Operations", marketAi: "AI", marketIntegration: "Integration",
+    statusDesigned: "Designed", statusPlanned: "Planned",
+    marketIngestTitle: "Broadway Ingest", marketIngestBody: "HTTP validation, idempotency, back-pressure, and TimescaleDB ingestion",
+    marketMediaTitle: "Media Collector", marketMediaBody: "Collect equipment audio, images, and video from NAS into object storage",
+    marketMaintenanceTitle: "Predictive Maintenance", marketMaintenanceBody: "Equipment anomalies and maintenance candidates from time-series and audio features",
+    marketOeeTitle: "OEE & Live Monitor", marketOeeBody: "Utilization, downtime reasons, and live production dashboards",
+    marketErpTitle: "ERP Connector", marketErpBody: "Synchronize master data, work orders, and results across explicit ERP boundaries",
+    marketVisionTitle: "Vision Inspection", marketVisionBody: "Connect visual, assembly, and dimensional results to quality candidates",
+    marketLlmTitle: "Manufacturing LLM", marketLlmBody: "Permission-aware assistance over approved manuals and work instructions",
+    marketRequestTitle: "Need another module?", marketRequestBody: "We first evaluate whether an independent extension is better than a core change.",
+    marketRequestAction: "Propose a module",
+    sdkLabel: "EXTENSION SDK", sdkTitle: "Connect factory capabilities<br>without modifying the core.",
+    sdkDescription: "The SDK prevents direct dependencies on core tables through APIs, events, and explicit contracts. These contracts are being designed; no distributable SDK package exists yet.",
+    sdkApiTitle: "REST & Context API", sdkApiBody: "Read and write interfaces with permissions and site boundaries",
+    sdkEventTitle: "Event & Outbox", sdkEventBody: "Subscribe to work-order, result, lot, and quality events",
+    sdkConnectorTitle: "Connector SDK", sdkConnectorBody: "HTTP, MQTT, OPC UA, and Modbus edge adapters",
+    sdkUiTitle: "UI Extension Points", sdkUiBody: "Register menus, screens, dashboards, and localization resources",
+    sdkSafetyTitle: "Permission & Audit", sdkSafetyBody: "Declare permissions, approval policies, and critical-action audits",
+    sdkPackageTitle: "Package Manifest", sdkPackageBody: "Versioned metadata for compatibility, permissions, and configuration",
+    sdkArchitecture: "View architecture", sdkIot: "Connector strategy", sdkStatus: "STATUS", sdkDraft: "Contract design stage",
+    adoptionLabel: "ADOPTION GUIDES", adoptionTitle: "Check factory readiness<br>before installation.",
+    adoptionDescription: "Public guides for reviewing production flow, master data, lots, equipment connectivity, and operational risk before choosing features.",
+    guideFitTitle: "Fit checklist", guideFitBody: "Quickly decide whether the factory needs an MES",
+    guideDiscoveryTitle: "Factory discovery", guideDiscoveryBody: "Review work orders, operations, quality, and lot flows",
+    guideDataTitle: "Data readiness", guideDataBody: "Check item, BOM, process, and defect-code readiness",
+    guideIotTitle: "Equipment connectivity", guideIotBody: "Review barcodes, PLCs, sensors, and networks",
+    guideDecisionTitle: "Adoption decision", guideDecisionBody: "Choose adoption, PoC, partial adoption, or hold",
+    guideRiskTitle: "Risks and mitigation", guideRiskBody: "Review data, operator input, integration, and security risks",
+    routeAssess: "Assess fit", routeDiscover: "Discover site and data", routePoc: "One-line PoC", routeExpand: "Expand after validation",
     roadmapLabel: "ROADMAP", roadmapTitle: "We are building<br>the foundation first.",
     roadmapDescription: "Implementation and shop-floor validation determine the order. Working production flows matter more than feature count.",
     phase0: "Vision and architecture", phase1: "MES Core", phase2: "Lot Traceability",
@@ -114,15 +192,28 @@ const translations = {
     promptPoint1: "Classify core, extensions, and external ownership", promptPoint2: "Draft server, storage, and network needs",
     promptPoint3: "Assess AI value, data, and risk", promptPoint4: "Build a 30/60/90-day PoC plan",
     openPrompt: "Open full prompt", copyPrompt: "Copy prompt", copiedPrompt: "Copied",
+    contactLabel: "ADOPTION & CONTACT", contactTitle: "Discuss adoption<br>and technical questions.",
+    contactDescription: "Share your factory context and problem so we can review fit, the first data-collection step, and the extensions you may need.",
+    contactPoint1: "Adoption and PoC scope", contactPoint2: "ERP, equipment, and data integration", contactPoint3: "Extension and SDK proposals",
+    formName: "Name", formEmail: "Email", formPhone: "Phone", formType: "Inquiry type",
+    formTypePlaceholder: "Select one", formTypeAdoption: "Adoption or PoC", formTypeIntegration: "ERP or equipment integration",
+    formTypeExtension: "Marketplace or SDK", formTypeContribution: "Open-source contribution", formTypeOther: "Other",
+    formSubject: "Subject", formMessage: "Message",
+    formNotice: "Your contact details and message are sent through Form2AI2Email to process this inquiry.",
+    formSubmit: "Send inquiry", formSending: "Sending", formSuccess: "Your inquiry was sent successfully.",
+    formFailure: "The message could not be sent. Please try again shortly.",
+    errorRequired: "This field is required.", errorEmail: "Enter a valid email address.",
+    errorPhone: "Enter a valid phone number.",
     ctaLabel: "BUILD WITH US", ctaTitle: "Build the smallest useful MES<br>for real factories.",
     ctaDescription: "We welcome contributors with manufacturing, Elixir/Phoenix, PostgreSQL, shop-floor UX, equipment integration, and localization experience.",
     joinProject: "Join the project", contributionGuide: "Contribution guide",
     footerStatus: "Open source · Early implementation", docs: "Docs", contribute: "Contribute"
   },
   ja: {
-    skip: "本文へ移動", navWhy: "プロジェクト", navCore: "コア", navAi: "AIモジュール", navArchitecture: "アーキテクチャ",
-    navRoadmap: "ロードマップ", navPrompt: "導入検証", language: "言語", heroStatus: "設計・初期実装段階",
-    heroTitle1: "製造現場を理解する", heroTitle2: "小さく堅牢なMES",
+    skip: "本文へ移動", navWhy: "プロジェクト", navCore: "コア", navAi: "AIモジュール",
+    navMarketplace: "マーケット", navSdk: "SDK", navAdoption: "導入ガイド", navContact: "お問い合わせ",
+    navArchitecture: "アーキテクチャ", navRoadmap: "ロードマップ", navPrompt: "LLM検証", language: "言語", heroStatus: "設計・初期実装段階",
+    heroTitle1: "製造現場のための", heroTitle2: "小さく堅牢なMES",
     heroDescription: "韓国の製造現場の実際の流れを出発点とし、国・言語・業種を越えて拡張できるオープンソースMESを構築します。",
     viewGithub: "GitHubで見る", readVision: "ビジョンを読む", principleSmall: "Small core",
     principleTrace: "Trace everything", principleExtend: "Extend deliberately",
@@ -163,6 +254,38 @@ const translations = {
     aiSafetyTitle: "作業者安全", aiSafetyBody: "保護具、危険区域、危険行動の候補検出",
     aiLlmTitle: "製造LLM", aiLlmBody: "マニュアル検索、作業標準、障害対応支援",
     safetyNoteTitle: "高リスクAIの原則", safetyNoteBody: "設備制御、品質判定、安全警報をAI単独で確定しません。現場検証、fail-safe、人の承認、監査記録が必要です。",
+    marketplaceLabel: "EXTENSION MARKETPLACE", marketplaceTitle: "コアは小さく、<br>現場機能はモジュールで。",
+    marketplaceDescription: "業種、設備、工場固有の要件をコアに入れず、導入可能な拡張として提供します。現在はロードマップで、パッケージは未公開です。",
+    marketplaceCatalog: "JSONカタログ", marketAll: "すべて", marketData: "データ収集",
+    marketOperations: "生産運用", marketAi: "AI", marketIntegration: "連携",
+    statusDesigned: "設計完了", statusPlanned: "計画",
+    marketIngestTitle: "Broadway Ingest", marketIngestBody: "HTTP検証、重複防止、バックプレッシャー、TimescaleDB格納",
+    marketMediaTitle: "Media Collector", marketMediaBody: "設備音、画像、映像をNASからobject storageへ収集",
+    marketMaintenanceTitle: "Predictive Maintenance", marketMaintenanceBody: "時系列・音響特徴による設備異常と保全候補",
+    marketOeeTitle: "OEE & Live Monitor", marketOeeBody: "設備稼働率、停止理由、リアルタイム生産ダッシュボード",
+    marketErpTitle: "ERP Connector", marketErpBody: "マスタ、作業指示、実績をERP境界に沿って同期",
+    marketVisionTitle: "Vision Inspection", marketVisionBody: "外観、組立、寸法検査を品質候補データへ接続",
+    marketLlmTitle: "Manufacturing LLM", marketLlmBody: "承認済みマニュアルと作業標準を検索する現場支援",
+    marketRequestTitle: "必要なモジュールがありますか？", marketRequestBody: "コア変更より独立拡張が適切かを先に検討します。",
+    marketRequestAction: "モジュールを提案",
+    sdkLabel: "EXTENSION SDK", sdkTitle: "MESコアを変更せず<br>現場機能を接続します。",
+    sdkDescription: "SDKはAPI、イベント、明示的な契約によりコア内部テーブルへの直接依存を防ぎます。現在は契約設計段階で、配布可能なSDKはまだありません。",
+    sdkApiTitle: "REST & Context API", sdkApiBody: "権限とサイト境界を適用した読み書き",
+    sdkEventTitle: "Event & Outbox", sdkEventBody: "作業指示、実績、LOT、品質イベントの購読",
+    sdkConnectorTitle: "Connector SDK", sdkConnectorBody: "HTTP、MQTT、OPC UA、Modbus edge adapter",
+    sdkUiTitle: "UI Extension Points", sdkUiBody: "メニュー、画面、ダッシュボード、多言語資源の登録",
+    sdkSafetyTitle: "Permission & Audit", sdkSafetyBody: "権限、承認ポリシー、重要操作の監査",
+    sdkPackageTitle: "Package Manifest", sdkPackageBody: "バージョン、互換性、権限、設定のメタデータ",
+    sdkArchitecture: "アーキテクチャ", sdkIot: "Connector戦略", sdkStatus: "STATUS", sdkDraft: "契約設計段階",
+    adoptionLabel: "ADOPTION GUIDES", adoptionTitle: "インストール前に、<br>工場の準備度を確認します。",
+    adoptionDescription: "生産フロー、マスタ、LOT、設備接続、運用リスクを順番に確認する公開文書です。",
+    guideFitTitle: "導入適合性", guideFitBody: "工場にMESが必要か素早く判断",
+    guideDiscoveryTitle: "現場業務調査", guideDiscoveryBody: "作業指示、工程、品質、LOTフローを調査",
+    guideDataTitle: "データ準備", guideDataBody: "品目、BOM、工程、不良コードの準備度",
+    guideIotTitle: "設備接続", guideIotBody: "バーコード、PLC、センサー、ネットワーク確認",
+    guideDecisionTitle: "導入判断", guideDecisionBody: "導入、PoC、部分導入、保留を判断",
+    guideRiskTitle: "リスクと対応", guideRiskBody: "データ、入力、連携、セキュリティリスク",
+    routeAssess: "適合性判断", routeDiscover: "現場・データ調査", routePoc: "1ラインPoC", routeExpand: "検証後に拡張",
     roadmapLabel: "ROADMAP", roadmapTitle: "現在は基盤を<br>固める段階です。",
     roadmapDescription: "実装と現場検証に基づき順序を調整し、機能数より実際に動く生産フローを優先します。",
     phase0: "ビジョンと設計", phase1: "MES Core", phase2: "LOT Traceability",
@@ -173,15 +296,28 @@ const translations = {
     promptPoint1: "コア・拡張・外部責任の分類", promptPoint2: "サーバー・ストレージ・ネットワーク案",
     promptPoint3: "AI価値・データ・リスク評価", promptPoint4: "30/60/90日PoC計画",
     openPrompt: "プロンプトを開く", copyPrompt: "コピー", copiedPrompt: "コピー完了",
+    contactLabel: "ADOPTION & CONTACT", contactTitle: "導入検討・技術相談を<br>お送りください。",
+    contactDescription: "工場の状況と課題から、適合性、データ収集の開始点、必要な拡張を検討できます。",
+    contactPoint1: "導入・PoC範囲", contactPoint2: "ERP・設備・データ連携", contactPoint3: "拡張・SDK提案",
+    formName: "お名前", formEmail: "メール", formPhone: "電話番号", formType: "お問い合わせ種別",
+    formTypePlaceholder: "選択してください", formTypeAdoption: "導入・PoC", formTypeIntegration: "ERP・設備連携",
+    formTypeExtension: "マーケット・SDK", formTypeContribution: "オープンソース貢献", formTypeOther: "その他",
+    formSubject: "件名", formMessage: "メッセージ",
+    formNotice: "お問い合わせ処理のため、連絡先と内容はForm2AI2Emailへ送信されます。",
+    formSubmit: "送信", formSending: "送信中", formSuccess: "お問い合わせを送信しました。",
+    formFailure: "送信できませんでした。しばらくしてから再試行してください。",
+    errorRequired: "必須項目です。", errorEmail: "有効なメールアドレスを入力してください。",
+    errorPhone: "有効な電話番号を入力してください。",
     ctaLabel: "BUILD WITH US", ctaTitle: "製造現場に必要な<br>最小MESを共に作ります。",
     ctaDescription: "製造実務、Elixir/Phoenix、PostgreSQL、現場UX、設備連携、多言語化の経験を持つ貢献者を募集しています。",
     joinProject: "プロジェクトに参加", contributionGuide: "貢献ガイド",
     footerStatus: "Open source · Early implementation", docs: "文書", contribute: "貢献"
   },
   zh: {
-    skip: "跳转到正文", navWhy: "项目", navCore: "核心", navAi: "AI 模块", navArchitecture: "架构",
-    navRoadmap: "路线图", navPrompt: "导入验证", language: "语言", heroStatus: "设计与早期实现阶段",
-    heroTitle1: "理解制造现场的", heroTitle2: "小型稳健 MES",
+    skip: "跳转到正文", navWhy: "项目", navCore: "核心", navAi: "AI 模块",
+    navMarketplace: "市场", navSdk: "SDK", navAdoption: "导入指南", navContact: "联系",
+    navArchitecture: "架构", navRoadmap: "路线图", navPrompt: "LLM 验证", language: "语言", heroStatus: "设计与早期实现阶段",
+    heroTitle1: "为制造现场打造的", heroTitle2: "小型稳健 MES",
     heroDescription: "从韩国制造现场的真实流程出发，构建可扩展到不同国家、语言和行业的开源制造执行系统。",
     viewGithub: "在 GitHub 查看", readVision: "阅读愿景", principleSmall: "Small core",
     principleTrace: "Trace everything", principleExtend: "Extend deliberately",
@@ -222,6 +358,38 @@ const translations = {
     aiSafetyTitle: "人员安全", aiSafetyBody: "防护用品、危险区域和危险行为候选检测",
     aiLlmTitle: "制造 LLM", aiLlmBody: "手册检索、作业标准和故障处理辅助",
     safetyNoteTitle: "高风险 AI 原则", safetyNoteBody: "AI 不会独立确定设备控制、质量判定或安全警报，必须进行现场验证、fail-safe、人工审批和审计记录。",
+    marketplaceLabel: "EXTENSION MARKETPLACE", marketplaceTitle: "保持核心小巧，<br>现场能力通过模块扩展。",
+    marketplaceDescription: "行业、设备和工厂特有需求不进入核心，而是作为可安装扩展提供。目前仅为路线图目录，尚未发布软件包。",
+    marketplaceCatalog: "查看 JSON 目录", marketAll: "全部", marketData: "数据采集",
+    marketOperations: "生产运营", marketAi: "AI", marketIntegration: "集成",
+    statusDesigned: "设计完成", statusPlanned: "计划",
+    marketIngestTitle: "Broadway Ingest", marketIngestBody: "HTTP 验证、幂等、背压和 TimescaleDB 写入",
+    marketMediaTitle: "Media Collector", marketMediaBody: "从 NAS 采集设备音频、图片和视频到 object storage",
+    marketMaintenanceTitle: "Predictive Maintenance", marketMaintenanceBody: "基于时序和音频特征的设备异常及维护候选",
+    marketOeeTitle: "OEE & Live Monitor", marketOeeBody: "设备利用率、停机原因和实时生产看板",
+    marketErpTitle: "ERP Connector", marketErpBody: "按明确边界同步主数据、工单和生产实绩",
+    marketVisionTitle: "Vision Inspection", marketVisionBody: "将外观、装配和尺寸检测连接到质量候选数据",
+    marketLlmTitle: "Manufacturing LLM", marketLlmBody: "基于权限检索已批准的手册和作业标准",
+    marketRequestTitle: "需要其他模块？", marketRequestBody: "先评估独立扩展是否比修改核心更合适。",
+    marketRequestAction: "提出模块建议",
+    sdkLabel: "EXTENSION SDK", sdkTitle: "无需修改 MES 核心<br>即可连接现场能力。",
+    sdkDescription: "SDK 通过 API、事件和明确契约避免扩展直接依赖核心表。目前处于契约设计阶段，尚无可发布的 SDK 软件包。",
+    sdkApiTitle: "REST & Context API", sdkApiBody: "带权限和站点边界的读写接口",
+    sdkEventTitle: "Event & Outbox", sdkEventBody: "订阅工单、实绩、LOT 和质量事件",
+    sdkConnectorTitle: "Connector SDK", sdkConnectorBody: "HTTP、MQTT、OPC UA 和 Modbus edge adapter",
+    sdkUiTitle: "UI Extension Points", sdkUiBody: "注册菜单、页面、看板和多语言资源",
+    sdkSafetyTitle: "Permission & Audit", sdkSafetyBody: "声明权限、审批策略和关键操作审计",
+    sdkPackageTitle: "Package Manifest", sdkPackageBody: "版本、兼容性、权限和配置元数据",
+    sdkArchitecture: "查看架构", sdkIot: "Connector 策略", sdkStatus: "STATUS", sdkDraft: "契约设计阶段",
+    adoptionLabel: "ADOPTION GUIDES", adoptionTitle: "安装之前，<br>先检查工厂准备度。",
+    adoptionDescription: "按顺序审查生产流程、主数据、LOT、设备连接和运营风险的公开文档。",
+    guideFitTitle: "适用性检查", guideFitBody: "快速判断工厂是否需要 MES",
+    guideDiscoveryTitle: "现场业务调查", guideDiscoveryBody: "调查工单、工序、质量和 LOT 流程",
+    guideDataTitle: "数据准备", guideDataBody: "检查物料、BOM、工序和不良代码",
+    guideIotTitle: "设备连接", guideIotBody: "检查条码、PLC、传感器和网络",
+    guideDecisionTitle: "导入决策", guideDecisionBody: "判断导入、PoC、部分导入或暂缓",
+    guideRiskTitle: "风险与应对", guideRiskBody: "检查数据、人员录入、集成和安全风险",
+    routeAssess: "评估适用性", routeDiscover: "调查现场与数据", routePoc: "单线 PoC", routeExpand: "验证后扩展",
     roadmapLabel: "ROADMAP", roadmapTitle: "当前阶段首先<br>打好基础。",
     roadmapDescription: "根据实现和现场验证调整顺序。真正可运行的生产流程比功能数量更重要。",
     phase0: "愿景与架构", phase1: "MES Core", phase2: "LOT Traceability",
@@ -232,6 +400,18 @@ const translations = {
     promptPoint1: "区分核心、扩展和外部系统责任", promptPoint2: "服务器、存储和网络草案",
     promptPoint3: "评估 AI 价值、数据和风险", promptPoint4: "制定 30/60/90 天 PoC 计划",
     openPrompt: "打开完整提示词", copyPrompt: "复制提示词", copiedPrompt: "已复制",
+    contactLabel: "ADOPTION & CONTACT", contactTitle: "发送导入评估<br>和技术咨询。",
+    contactDescription: "提供工厂现状和要解决的问题，以便评估适用性、数据采集起点和所需扩展。",
+    contactPoint1: "导入与 PoC 范围", contactPoint2: "ERP、设备和数据集成", contactPoint3: "扩展模块与 SDK 建议",
+    formName: "姓名", formEmail: "电子邮件", formPhone: "电话号码", formType: "咨询类型",
+    formTypePlaceholder: "请选择", formTypeAdoption: "导入或 PoC", formTypeIntegration: "ERP 或设备集成",
+    formTypeExtension: "市场或 SDK", formTypeContribution: "开源贡献", formTypeOther: "其他",
+    formSubject: "主题", formMessage: "消息",
+    formNotice: "为处理咨询，联系方式和消息将通过 Form2AI2Email 发送。",
+    formSubmit: "发送咨询", formSending: "发送中", formSuccess: "咨询已成功发送。",
+    formFailure: "发送失败，请稍后重试。",
+    errorRequired: "此项为必填项。", errorEmail: "请输入有效的电子邮件地址。",
+    errorPhone: "请输入有效的电话号码。",
     ctaLabel: "BUILD WITH US", ctaTitle: "共同构建制造现场<br>真正需要的最小 MES。",
     ctaDescription: "欢迎具有制造业务、Elixir/Phoenix、PostgreSQL、现场 UX、设备集成和多语言经验的贡献者。",
     joinProject: "参与项目", contributionGuide: "贡献指南",
@@ -279,4 +459,94 @@ copyPromptButton.addEventListener("click", async () => {
   window.setTimeout(() => {
     copyPromptButton.textContent = originalLabel;
   }, 1800);
+});
+
+const contactForm = document.querySelector("#contact-form");
+const formStatus = document.querySelector("#form-status");
+const formSubmitButton = contactForm.querySelector(".form-submit");
+const submitLabel = contactForm.querySelector(".submit-label");
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const phonePattern = /^\+?[0-9][0-9\s().-]{6,28}[0-9]$/;
+
+function currentDictionary() {
+  return translations[languageSelect.value] || translations.ko;
+}
+
+function setFieldError(field, message) {
+  const error = contactForm.querySelector(`[data-error-for="${field.name}"]`);
+  field.setAttribute("aria-invalid", message ? "true" : "false");
+  if (error) error.textContent = message;
+}
+
+function validateContactForm() {
+  const dictionary = currentDictionary();
+  let valid = true;
+
+  for (const field of contactForm.elements) {
+    if (!field.name) continue;
+    const value = field.value.trim();
+    let message = "";
+
+    if (field.required && !value) {
+      message = dictionary.errorRequired;
+    } else if (field.name === "email" && !emailPattern.test(value)) {
+      message = dictionary.errorEmail;
+    } else if (field.name === "phone" && !phonePattern.test(value)) {
+      message = dictionary.errorPhone;
+    }
+
+    setFieldError(field, message);
+    if (message) valid = false;
+  }
+
+  return valid;
+}
+
+contactForm.addEventListener("input", (event) => {
+  if (event.target.name) setFieldError(event.target, "");
+});
+
+contactForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  formStatus.textContent = "";
+  formStatus.className = "form-status";
+
+  if (!validateContactForm()) {
+    contactForm.querySelector('[aria-invalid="true"]')?.focus();
+    return;
+  }
+
+  const dictionary = currentDictionary();
+  const data = Object.fromEntries(new FormData(contactForm).entries());
+  formSubmitButton.disabled = true;
+  formSubmitButton.classList.add("loading");
+  submitLabel.textContent = dictionary.formSending;
+
+  try {
+    const response = await fetch(
+      "https://form2ai2email-worker.kilos-network.workers.dev/api/submit",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          form_id: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+          data
+        })
+      }
+    );
+
+    if (!response.ok) throw new Error(`Form submission failed: ${response.status}`);
+
+    contactForm.reset();
+    formStatus.textContent = dictionary.formSuccess;
+    formStatus.className = "form-status success";
+  } catch (error) {
+    console.error(error);
+    formStatus.textContent = dictionary.formFailure;
+    formStatus.className = "form-status error";
+  } finally {
+    formSubmitButton.disabled = false;
+    formSubmitButton.classList.remove("loading");
+    submitLabel.textContent = dictionary.formSubmit;
+  }
 });

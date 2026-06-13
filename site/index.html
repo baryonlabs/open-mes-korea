@@ -108,6 +108,35 @@
     <script src="app.js" defer></script>
   </head>
   <body>
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="icon-work" viewBox="0 0 24 24"><path d="M4 7h16v12H4zM9 7V4h6v3M4 11h16M10 14h4"/></symbol>
+      <symbol id="icon-trace" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M8 6h8M7 8l4 8M17 8l-4 8"/></symbol>
+      <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+      <symbol id="icon-plug" viewBox="0 0 24 24"><path d="M8 3v5M16 3v5M6 8h12v3a6 6 0 0 1-6 6v4M9 21h6"/></symbol>
+      <symbol id="icon-audit" viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h3"/><path d="m14 16 2 2 4-5"/></symbol>
+      <symbol id="icon-brain" viewBox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-1 5 3 3 0 0 0 4 4M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 1 5 3 3 0 0 1-4 4M12 3v18M9 8h3M12 12h3M8 16h4"/></symbol>
+      <symbol id="icon-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+      <symbol id="icon-media" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m5 17 5-4 3 2 3-3 3 5"/></symbol>
+      <symbol id="icon-wrench" viewBox="0 0 24 24"><path d="M14 6a5 5 0 0 0-6 6L3 17l4 4 5-5a5 5 0 0 0 6-6l-3 3-3-3z"/></symbol>
+      <symbol id="icon-gauge" viewBox="0 0 24 24"><path d="M4 18a8 8 0 1 1 16 0M12 18l4-6M7 18h10"/></symbol>
+      <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></symbol>
+      <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M3 7h5l2-3h4l2 3h5v13H3z"/><circle cx="12" cy="13" r="4"/></symbol>
+      <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 5a4 4 0 0 1 4-2h4v17H8a4 4 0 0 0-4 2zM20 5a4 4 0 0 0-4-2h-4v17h4a4 4 0 0 1 4 2z"/></symbol>
+      <symbol id="icon-api" viewBox="0 0 24 24"><path d="m8 5-5 7 5 7M16 5l5 7-5 7M14 3l-4 18"/></symbol>
+      <symbol id="icon-events" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11l10-5M7 13l10 5"/></symbol>
+      <symbol id="icon-layout" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.4 8 8 10 4.6-2 8-5 8-10V6z"/><path d="m8 12 3 3 5-6"/></symbol>
+      <symbol id="icon-package" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zM3 8v9l9 5 9-5V8M12 13v9"/></symbol>
+      <symbol id="icon-checklist" viewBox="0 0 24 24"><path d="M9 5h11M9 12h11M9 19h11M3 5l2 2 3-4M3 12l2 2 3-4M3 19l2 2 3-4"/></symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></symbol>
+      <symbol id="icon-network" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="5"/><rect x="3" y="16" width="6" height="5"/><rect x="15" y="16" width="6" height="5"/><path d="M12 8v4M6 16v-4h12v4"/></symbol>
+      <symbol id="icon-decision" viewBox="0 0 24 24"><path d="M12 3v18M12 8h6l3 3-3 3h-6M12 5H6L3 8l3 3h6"/></symbol>
+      <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 9v5M12 18h.01"/></symbol>
+      <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 7 9-7"/></symbol>
+      <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+      <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+      <symbol id="icon-bolt" viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 9-12h-7z"/></symbol>
+    </svg>
     <a class="skip-link" href="#main" data-i18n="skip">본문으로 이동</a>
 
     <header class="site-header">
@@ -118,10 +147,11 @@
 
       <nav class="desktop-nav" aria-label="Primary navigation">
         <a href="#why" data-i18n="navWhy">프로젝트</a>
-        <a href="#core" data-i18n="navCore">핵심 기능</a>
-        <a href="#ai-modules" data-i18n="navAi">AI 모듈</a>
-        <a href="#architecture" data-i18n="navArchitecture">아키텍처</a>
-        <a href="#adoption-prompt" data-i18n="navPrompt">도입 검증</a>
+        <a href="#marketplace" data-i18n="navMarketplace">마켓플레이스</a>
+        <a href="#sdk" data-i18n="navSdk">SDK</a>
+        <a href="#adoption-guides" data-i18n="navAdoption">도입 가이드</a>
+        <a href="#contact" data-i18n="navContact">문의</a>
+        <a href="#adoption-prompt" data-i18n="navPrompt">LLM 검증</a>
       </nav>
 
       <div class="header-actions">
@@ -155,7 +185,7 @@
             <span data-i18n="heroStatus">설계 및 초기 구현 단계</span>
           </div>
           <h1>
-            <span data-i18n="heroTitle1">제조 현장을 이해하는</span>
+            <span data-i18n="heroTitle1">제조 현장을 위한</span>
             <strong data-i18n="heroTitle2">작고 단단한 MES</strong>
           </h1>
           <p class="hero-description" data-i18n="heroDescription">
@@ -289,6 +319,7 @@
       <section class="pillars">
         <article>
           <span class="pillar-number">01</span>
+          <svg class="pillar-icon"><use href="#icon-work"/></svg>
           <h3 data-i18n="pillarFieldTitle">현장 우선</h3>
           <p data-i18n="pillarFieldBody">
             태블릿, 바코드와 짧은 입력 흐름을 중심으로 작업자가 실제로
@@ -297,6 +328,7 @@
         </article>
         <article>
           <span class="pillar-number">02</span>
+          <svg class="pillar-icon"><use href="#icon-globe"/></svg>
           <h3 data-i18n="pillarGlobalTitle">다국어 확장</h3>
           <p data-i18n="pillarGlobalBody">
             한국어를 기본으로 UI, 문서, 업무 용어와 국가별 규칙을
@@ -305,6 +337,7 @@
         </article>
         <article>
           <span class="pillar-number">03</span>
+          <svg class="pillar-icon"><use href="#icon-shield"/></svg>
           <h3 data-i18n="pillarReliableTitle">안정적인 데이터</h3>
           <p data-i18n="pillarReliableBody">
             감사 로그, 중복 방지, 정정 이력과 명시적인 LOT genealogy로
@@ -313,6 +346,7 @@
         </article>
         <article>
           <span class="pillar-number">04</span>
+          <svg class="pillar-icon"><use href="#icon-bolt"/></svg>
           <h3 data-i18n="pillarFastTitle">작고 빠른 코어</h3>
           <p data-i18n="pillarFastBody">
             공통 생산 흐름만 코어에 두고 업종별 기능과 연동은 확장으로
@@ -335,42 +369,42 @@
 
         <div class="capability-grid">
           <article>
-            <div class="capability-icon">WO</div>
+            <div class="capability-icon"><svg><use href="#icon-work"/></svg></div>
             <h3 data-i18n="capExecutionTitle">생산 실행</h3>
             <p data-i18n="capExecutionBody">
               작업지시, 공정 시작·종료, 생산수량과 불량 기록
             </p>
           </article>
           <article>
-            <div class="capability-icon">LT</div>
+            <div class="capability-icon"><svg><use href="#icon-trace"/></svg></div>
             <h3 data-i18n="capLotTitle">LOT 추적</h3>
             <p data-i18n="capLotBody">
               자재 투입부터 제품 LOT까지 양방향 genealogy
             </p>
           </article>
           <article>
-            <div class="capability-icon">DA</div>
+            <div class="capability-icon"><svg><use href="#icon-chart"/></svg></div>
             <h3 data-i18n="capDataTitle">데이터 분석</h3>
             <p data-i18n="capDataBody">
               생산량, 불량률, 공정시간과 기간별 기본 분석
             </p>
           </article>
           <article>
-            <div class="capability-icon">EX</div>
+            <div class="capability-icon"><svg><use href="#icon-plug"/></svg></div>
             <h3 data-i18n="capExtensionTitle">확장 경계</h3>
             <p data-i18n="capExtensionBody">
               REST, webhook, MQTT와 표준 제조 이벤트
             </p>
           </article>
           <article>
-            <div class="capability-icon">AU</div>
+            <div class="capability-icon"><svg><use href="#icon-audit"/></svg></div>
             <h3 data-i18n="capAuditTitle">감사와 권한</h3>
             <p data-i18n="capAuditBody">
               모든 주요 쓰기의 actor, 변경 이력과 승인 기록
             </p>
           </article>
           <article>
-            <div class="capability-icon">AI</div>
+            <div class="capability-icon"><svg><use href="#icon-brain"/></svg></div>
             <h3 data-i18n="capAiTitle">통제 가능한 AI</h3>
             <p data-i18n="capAiBody">
               읽기, 제안, 승인과 실행을 분리한 안전한 구조
@@ -428,14 +462,14 @@
         </div>
 
         <div class="ai-module-grid">
-          <article><span>01 / QUALITY</span><h3 data-i18n="aiVisionTitle">비전 검사</h3><p data-i18n="aiVisionBody">외관, 치수, 조립과 내부 결함 후보 탐지</p></article>
-          <article><span>02 / SIMULATION</span><h3 data-i18n="aiVirtualTitle">가상 계측·시운전</h3><p data-i18n="aiVirtualBody">센서 기반 품질 예측과 디지털 트윈 검증</p></article>
-          <article><span>03 / PROCESS</span><h3 data-i18n="aiOptimizeTitle">공정 최적화</h3><p data-i18n="aiOptimizeBody">공정 변수, 수율과 에너지 최적 조건 제안</p></article>
-          <article><span>04 / LOGISTICS</span><h3 data-i18n="aiLogisticsTitle">자율 물류</h3><p data-i18n="aiLogisticsBody">AMR·AGV 경로와 비전 피킹 연동</p></article>
-          <article><span>05 / PLANNING</span><h3 data-i18n="aiPlanningTitle">예측·스케줄링</h3><p data-i18n="aiPlanningBody">수요, 재고와 APS 작업 우선순위 최적화</p></article>
-          <article><span>06 / EQUIPMENT</span><h3 data-i18n="aiMaintenanceTitle">예지보전</h3><p data-i18n="aiMaintenanceBody">설비 이상, 고장 가능성과 점검 시점 제안</p></article>
-          <article><span>07 / SAFETY</span><h3 data-i18n="aiSafetyTitle">작업자 안전</h3><p data-i18n="aiSafetyBody">보호구, 위험구역과 위험 행동 감지 후보</p></article>
-          <article><span>08 / KNOWLEDGE</span><h3 data-i18n="aiLlmTitle">제조 LLM</h3><p data-i18n="aiLlmBody">매뉴얼, 작업표준 검색과 오류 대응 보조</p></article>
+          <article><span>01 / QUALITY</span><svg><use href="#icon-camera"/></svg><h3 data-i18n="aiVisionTitle">비전 검사</h3><p data-i18n="aiVisionBody">외관, 치수, 조립과 내부 결함 후보 탐지</p></article>
+          <article><span>02 / SIMULATION</span><svg><use href="#icon-gauge"/></svg><h3 data-i18n="aiVirtualTitle">가상 계측·시운전</h3><p data-i18n="aiVirtualBody">센서 기반 품질 예측과 디지털 트윈 검증</p></article>
+          <article><span>03 / PROCESS</span><svg><use href="#icon-chart"/></svg><h3 data-i18n="aiOptimizeTitle">공정 최적화</h3><p data-i18n="aiOptimizeBody">공정 변수, 수율과 에너지 최적 조건 제안</p></article>
+          <article><span>04 / LOGISTICS</span><svg><use href="#icon-network"/></svg><h3 data-i18n="aiLogisticsTitle">자율 물류</h3><p data-i18n="aiLogisticsBody">AMR·AGV 경로와 비전 피킹 연동</p></article>
+          <article><span>05 / PLANNING</span><svg><use href="#icon-decision"/></svg><h3 data-i18n="aiPlanningTitle">예측·스케줄링</h3><p data-i18n="aiPlanningBody">수요, 재고와 APS 작업 우선순위 최적화</p></article>
+          <article><span>06 / EQUIPMENT</span><svg><use href="#icon-wrench"/></svg><h3 data-i18n="aiMaintenanceTitle">예지보전</h3><p data-i18n="aiMaintenanceBody">설비 이상, 고장 가능성과 점검 시점 제안</p></article>
+          <article><span>07 / SAFETY</span><svg><use href="#icon-shield"/></svg><h3 data-i18n="aiSafetyTitle">작업자 안전</h3><p data-i18n="aiSafetyBody">보호구, 위험구역과 위험 행동 감지 후보</p></article>
+          <article><span>08 / KNOWLEDGE</span><svg><use href="#icon-book"/></svg><h3 data-i18n="aiLlmTitle">제조 LLM</h3><p data-i18n="aiLlmBody">매뉴얼, 작업표준 검색과 오류 대응 보조</p></article>
         </div>
         <div class="safety-note">
           <b data-i18n="safetyNoteTitle">고위험 기능 원칙</b>
@@ -443,6 +477,188 @@
             설비 제어, 품질 판정과 안전 경보는 AI가 단독 확정하지 않습니다.
             현장 검증, fail-safe, 사람의 승인과 감사 로그를 요구합니다.
           </p>
+        </div>
+      </section>
+
+      <section class="marketplace-section" id="marketplace">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-i18n="marketplaceLabel">EXTENSION MARKETPLACE</p>
+            <h2 data-i18n="marketplaceTitle">코어는 작게,<br>현장 기능은 모듈로.</h2>
+          </div>
+          <div>
+            <p data-i18n="marketplaceDescription">
+              업종, 설비와 공장마다 다른 요구를 코어에 넣지 않고 설치 가능한
+              확장 모듈로 제공합니다. 현재는 로드맵 카탈로그이며 패키지는
+              아직 공개되지 않았습니다.
+            </p>
+            <a class="text-link" href="marketplace.json" target="_blank">
+              <span data-i18n="marketplaceCatalog">JSON 카탈로그 보기</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="marketplace-filter" aria-label="Marketplace categories">
+          <span class="active" data-i18n="marketAll">전체</span>
+          <span data-i18n="marketData">데이터 수집</span>
+          <span data-i18n="marketOperations">생산 운영</span>
+          <span data-i18n="marketAi">AI</span>
+          <span data-i18n="marketIntegration">연동</span>
+        </div>
+
+        <div class="marketplace-grid">
+          <article>
+            <div class="module-head"><span class="module-mark"><svg><use href="#icon-database"/></svg></span><i data-i18n="statusDesigned">설계 완료</i></div>
+            <small>DATA · EXT-1</small>
+            <h3 data-i18n="marketIngestTitle">Broadway Ingest</h3>
+            <p data-i18n="marketIngestBody">HTTP 이벤트 검증, 중복 제거, 배압과 TimescaleDB 적재</p>
+            <div class="module-tags"><span>Broadway</span><span>TimescaleDB</span></div>
+          </article>
+          <article>
+            <div class="module-head"><span class="module-mark"><svg><use href="#icon-media"/></svg></span><i data-i18n="statusDesigned">설계 완료</i></div>
+            <small>DATA · EXT-2</small>
+            <h3 data-i18n="marketMediaTitle">Media Collector</h3>
+            <p data-i18n="marketMediaBody">설비 소음, 이미지와 영상을 NAS에서 수집해 object storage로 보관</p>
+            <div class="module-tags"><span>MinIO</span><span>S3</span></div>
+          </article>
+          <article>
+            <div class="module-head"><span class="module-mark"><svg><use href="#icon-wrench"/></svg></span><i class="planned" data-i18n="statusPlanned">계획</i></div>
+            <small>AI · EXT-3</small>
+            <h3 data-i18n="marketMaintenanceTitle">Predictive Maintenance</h3>
+            <p data-i18n="marketMaintenanceBody">시계열과 소음 특징 기반 설비 이상 및 정비 시점 후보</p>
+            <div class="module-tags"><span>Anomaly</span><span>Approval</span></div>
+          </article>
+          <article>
+            <div class="module-head"><span class="module-mark"><svg><use href="#icon-gauge"/></svg></span><i class="planned" data-i18n="statusPlanned">계획</i></div>
+            <small>OPERATIONS · EXT-4</small>
+            <h3 data-i18n="marketOeeTitle">OEE & Live Monitor</h3>
+            <p data-i18n="marketOeeBody">설비 가동률, 정지 원인과 실시간 생산현황 대시보드</p>
+            <div class="module-tags"><span>OEE</span><span>LiveView</span></div>
+          </article>
+          <article>
+            <div class="module-head"><span class="module-mark"><svg><use href="#icon-link"/></svg></span><i class="planned" data-i18n="statusPlanned">계획</i></div>
+            <small>INTEGRATION</small>
+            <h3 data-i18n="marketErpTitle">ERP Connector</h3>
+            <p data-i18n="marketErpBody">기준정보, 작업지시와 생산실적을 ERP 경계에 맞춰 동기화</p>
+            <div class="module-tags"><span>REST</span><span>Outbox</span></div>
+          </article>
+          <article>
+            <div class="module-head"><span class="module-mark"><svg><use href="#icon-camera"/></svg></span><i class="planned" data-i18n="statusPlanned">계획</i></div>
+            <small>AI · QUALITY</small>
+            <h3 data-i18n="marketVisionTitle">Vision Inspection</h3>
+            <p data-i18n="marketVisionBody">외관, 조립과 치수 검사 결과를 품질 후보 데이터로 연결</p>
+            <div class="module-tags"><span>Vision</span><span>Quality</span></div>
+          </article>
+          <article>
+            <div class="module-head"><span class="module-mark"><svg><use href="#icon-book"/></svg></span><i class="planned" data-i18n="statusPlanned">계획</i></div>
+            <small>AI · KNOWLEDGE</small>
+            <h3 data-i18n="marketLlmTitle">Manufacturing LLM</h3>
+            <p data-i18n="marketLlmBody">승인된 매뉴얼과 작업표준을 검색하는 권한 기반 현장 도우미</p>
+            <div class="module-tags"><span>RAG</span><span>Context API</span></div>
+          </article>
+          <article class="marketplace-request">
+            <small>COMMUNITY</small>
+            <h3 data-i18n="marketRequestTitle">필요한 모듈이 있나요?</h3>
+            <p data-i18n="marketRequestBody">코어 변경보다 독립 확장이 적합한지 먼저 함께 검토합니다.</p>
+            <a href="https://github.com/baryonlabs/open-mes-korea/issues" target="_blank" rel="noreferrer">
+              <span data-i18n="marketRequestAction">모듈 제안하기</span><span>↗</span>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section class="sdk-section" id="sdk">
+        <div class="sdk-copy">
+          <p class="section-label" data-i18n="sdkLabel">EXTENSION SDK</p>
+          <h2 data-i18n="sdkTitle">MES 코어를 건드리지 않고<br>현장 기능을 연결합니다.</h2>
+          <p data-i18n="sdkDescription">
+            SDK는 확장이 코어 내부 테이블에 직접 의존하지 않도록 API,
+            이벤트와 명시적 계약을 제공합니다. 현재 아래 계약을 설계하는
+            단계이며 배포 가능한 SDK 패키지는 아직 없습니다.
+          </p>
+          <div class="sdk-contracts">
+            <article><span><svg><use href="#icon-api"/></svg></span><div><b data-i18n="sdkApiTitle">REST & Context API</b><p data-i18n="sdkApiBody">권한과 사이트 경계를 적용한 읽기·쓰기 인터페이스</p></div></article>
+            <article><span><svg><use href="#icon-events"/></svg></span><div><b data-i18n="sdkEventTitle">Event & Outbox</b><p data-i18n="sdkEventBody">작업지시, 실적, LOT와 품질 이벤트 구독</p></div></article>
+            <article><span><svg><use href="#icon-plug"/></svg></span><div><b data-i18n="sdkConnectorTitle">Connector SDK</b><p data-i18n="sdkConnectorBody">HTTP, MQTT, OPC UA와 Modbus edge adapter</p></div></article>
+            <article><span><svg><use href="#icon-layout"/></svg></span><div><b data-i18n="sdkUiTitle">UI Extension Points</b><p data-i18n="sdkUiBody">메뉴, 화면, 대시보드와 다국어 리소스 등록</p></div></article>
+            <article><span><svg><use href="#icon-shield"/></svg></span><div><b data-i18n="sdkSafetyTitle">Permission & Audit</b><p data-i18n="sdkSafetyBody">권한 선언, 승인 정책과 모든 중요 액션 감사</p></div></article>
+            <article><span><svg><use href="#icon-package"/></svg></span><div><b data-i18n="sdkPackageTitle">Package Manifest</b><p data-i18n="sdkPackageBody">버전, 호환성, 권한과 설정을 명시하는 모듈 메타데이터</p></div></article>
+          </div>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/system-architecture.md" target="_blank" rel="noreferrer" data-i18n="sdkArchitecture">아키텍처 보기</a>
+            <a class="button button-dark" href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/iot-connectivity-open-source-strategy.md" target="_blank" rel="noreferrer" data-i18n="sdkIot">Connector 전략</a>
+          </div>
+        </div>
+        <div class="sdk-code" aria-label="Extension manifest preview">
+          <div class="console-bar"><span></span><span></span><span></span><b>extension.manifest</b></div>
+          <pre><code>id: <span class="code-value">equipment_ingest</span>
+version: <span class="code-value">0.1.0</span>
+compatibility:
+  core: <span class="code-value">"&gt;= 0.1"</span>
+
+permissions:
+  - equipment:read
+  - telemetry:write
+
+subscribes:
+  - operation.started
+  - operation.completed
+
+provides:
+  - ingestion.http
+  - telemetry.query
+
+audit:
+  required: <span class="code-value">true</span></code></pre>
+          <div class="sdk-status">
+            <span data-i18n="sdkStatus">STATUS</span>
+            <b data-i18n="sdkDraft">계약 설계 단계</b>
+          </div>
+        </div>
+      </section>
+
+      <section class="adoption-section" id="adoption-guides">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-i18n="adoptionLabel">ADOPTION GUIDES</p>
+            <h2 data-i18n="adoptionTitle">설치보다 먼저,<br>공장의 준비도를 확인합니다.</h2>
+          </div>
+          <p data-i18n="adoptionDescription">
+            기능 목록만 보고 도입하지 않도록 생산 흐름, 기준정보, LOT,
+            설비 연결과 운영 위험을 순서대로 검토하는 공개 문서입니다.
+          </p>
+        </div>
+
+        <div class="guide-grid">
+          <a href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/adoption/fit-checklist.md" target="_blank" rel="noreferrer">
+            <span><svg><use href="#icon-checklist"/></svg></span><div><h3 data-i18n="guideFitTitle">도입 적합성</h3><p data-i18n="guideFitBody">우리 공장에 MES가 필요한지 빠르게 판단</p></div><i>↗</i>
+          </a>
+          <a href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/adoption/factory-discovery-questionnaire.md" target="_blank" rel="noreferrer">
+            <span><svg><use href="#icon-search"/></svg></span><div><h3 data-i18n="guideDiscoveryTitle">현장 업무 조사</h3><p data-i18n="guideDiscoveryBody">작업지시, 공정, 품질과 LOT 흐름 조사</p></div><i>↗</i>
+          </a>
+          <a href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/adoption/data-readiness-checklist.md" target="_blank" rel="noreferrer">
+            <span><svg><use href="#icon-database"/></svg></span><div><h3 data-i18n="guideDataTitle">데이터 준비</h3><p data-i18n="guideDataBody">품목, BOM, 공정과 불량 코드 준비도 확인</p></div><i>↗</i>
+          </a>
+          <a href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/adoption/iot-connectivity-checklist.md" target="_blank" rel="noreferrer">
+            <span><svg><use href="#icon-network"/></svg></span><div><h3 data-i18n="guideIotTitle">설비 연결</h3><p data-i18n="guideIotBody">바코드, PLC, 센서와 네트워크 점검</p></div><i>↗</i>
+          </a>
+          <a href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/adoption/adoption-decision-guide.md" target="_blank" rel="noreferrer">
+            <span><svg><use href="#icon-decision"/></svg></span><div><h3 data-i18n="guideDecisionTitle">도입 의사결정</h3><p data-i18n="guideDecisionBody">도입, PoC, 부분 도입 또는 보류 판정</p></div><i>↗</i>
+          </a>
+          <a href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/adoption/risks-and-mitigations.md" target="_blank" rel="noreferrer">
+            <span><svg><use href="#icon-alert"/></svg></span><div><h3 data-i18n="guideRiskTitle">리스크와 대응</h3><p data-i18n="guideRiskBody">데이터, 현장 입력, 연동과 보안 위험 확인</p></div><i>↗</i>
+          </a>
+        </div>
+
+        <div class="adoption-route">
+          <div><span>01</span><b data-i18n="routeAssess">적합성 판단</b></div>
+          <i>→</i>
+          <div><span>02</span><b data-i18n="routeDiscover">현장·데이터 조사</b></div>
+          <i>→</i>
+          <div><span>03</span><b data-i18n="routePoc">한 라인 PoC</b></div>
+          <i>→</i>
+          <div><span>04</span><b data-i18n="routeExpand">검증 후 확장</b></div>
         </div>
       </section>
 
@@ -532,6 +748,74 @@ output:
             <a href="llm.txt">llm.txt <span>↗</span></a>
           </div>
         </div>
+      </section>
+
+      <section class="contact-section" id="contact">
+        <div class="contact-intro">
+          <p class="section-label" data-i18n="contactLabel">ADOPTION & CONTACT</p>
+          <h2 data-i18n="contactTitle">도입 검토와 기술 문의를<br>보내주세요.</h2>
+          <p data-i18n="contactDescription">
+            공장 현황과 해결하려는 문제를 알려주시면 도입 적합성, 데이터
+            수집 시작점과 필요한 확장 모듈을 검토할 수 있습니다.
+          </p>
+          <div class="contact-points">
+            <div><svg><use href="#icon-checklist"/></svg><span data-i18n="contactPoint1">도입·PoC 범위 검토</span></div>
+            <div><svg><use href="#icon-plug"/></svg><span data-i18n="contactPoint2">ERP·설비·데이터 연동 문의</span></div>
+            <div><svg><use href="#icon-package"/></svg><span data-i18n="contactPoint3">확장 모듈·SDK 제안</span></div>
+          </div>
+        </div>
+
+        <form class="contact-form" id="contact-form" novalidate>
+          <div class="form-grid">
+            <label>
+              <span data-i18n="formName">이름</span>
+              <input type="text" name="name" autocomplete="name" maxlength="80" required>
+              <small class="field-error" data-error-for="name"></small>
+            </label>
+            <label>
+              <span data-i18n="formEmail">이메일</span>
+              <input type="email" name="email" autocomplete="email" maxlength="160" required>
+              <small class="field-error" data-error-for="email"></small>
+            </label>
+            <label>
+              <span data-i18n="formPhone">전화번호</span>
+              <input type="tel" name="phone" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="+82 10-1234-5678" required>
+              <small class="field-error" data-error-for="phone"></small>
+            </label>
+            <label>
+              <span data-i18n="formType">문의 유형</span>
+              <select name="inquiry_type" required>
+                <option value="" data-i18n="formTypePlaceholder">선택해 주세요</option>
+                <option value="adoption" data-i18n="formTypeAdoption">도입·PoC 검토</option>
+                <option value="integration" data-i18n="formTypeIntegration">ERP·설비 연동</option>
+                <option value="extension" data-i18n="formTypeExtension">마켓플레이스·SDK</option>
+                <option value="contribution" data-i18n="formTypeContribution">오픈소스 기여</option>
+                <option value="other" data-i18n="formTypeOther">기타 문의</option>
+              </select>
+              <small class="field-error" data-error-for="inquiry_type"></small>
+            </label>
+            <label class="form-wide">
+              <span data-i18n="formSubject">제목</span>
+              <input type="text" name="subject" maxlength="160" required>
+              <small class="field-error" data-error-for="subject"></small>
+            </label>
+            <label class="form-wide">
+              <span data-i18n="formMessage">메시지</span>
+              <textarea name="message" rows="6" maxlength="4000" required></textarea>
+              <small class="field-error" data-error-for="message"></small>
+            </label>
+          </div>
+          <p class="form-notice" data-i18n="formNotice">
+            문의 처리를 위해 입력한 연락처와 메시지가 Form2AI2Email 서비스로 전송됩니다.
+          </p>
+          <div class="form-actions">
+            <button class="button button-primary form-submit" type="submit">
+              <span class="submit-label" data-i18n="formSubmit">문의 보내기</span>
+              <span class="submit-spinner" aria-hidden="true"></span>
+            </button>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          </div>
+        </form>
       </section>
 
       <section class="cta">
