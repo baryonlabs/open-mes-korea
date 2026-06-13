@@ -59,14 +59,27 @@ open-mes.org
 
 GitHub Pages 공식 안내에 맞춰 apex와 `www`를 함께 구성한다.
 
+| Type | Name | Content | Proxy |
+|---|---|---|---|
+| A | `@` | `185.199.108.153` | DNS only |
+| A | `@` | `185.199.109.153` | DNS only |
+| A | `@` | `185.199.110.153` | DNS only |
+| A | `@` | `185.199.111.153` | DNS only |
+| AAAA | `@` | `2606:50c0:8000::153` | DNS only |
+| AAAA | `@` | `2606:50c0:8001::153` | DNS only |
+| AAAA | `@` | `2606:50c0:8002::153` | DNS only |
+| AAAA | `@` | `2606:50c0:8003::153` | DNS only |
+| CNAME | `www` | `baryonlabs.github.io` | DNS only |
+
 ```text
-openmeskorea.org
-www.openmeskorea.org
+openmeskorea.org     → GitHub Pages
+www.openmeskorea.org → openmeskorea.org
 ```
 
-`www`는 주 도메인으로 리디렉션하고, DNSSEC와 자동 갱신을 활성화한다.
-실제 DNS 레코드는 GitHub Pages에 custom domain을 등록할 때 표시되는
-최신 값을 사용한다.
+GitHub Pages가 apex 도메인을 canonical custom domain으로 사용하므로
+`www` 요청은 apex로 자동 리디렉션된다. 인증서 발급과 DNS 진단이 끝날
+때까지 Cloudflare 프록시는 끄고 `DNS only`로 유지한다. GitHub Pages에서
+HTTPS가 활성화된 뒤 DNSSEC와 자동 갱신 상태도 확인한다.
 
 ## 운영 확인
 
