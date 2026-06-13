@@ -31,6 +31,7 @@ body {
   color: var(--ink);
   font-family: var(--sans);
   line-height: 1.6;
+  word-break: keep-all;
 }
 
 a {
