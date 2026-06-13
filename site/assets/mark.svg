@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Open MES Korea</title>
+  <rect width="64" height="64" rx="12" fill="#ff5c35"/>
+  <path d="M15 45V19h8l9 13 9-13h8v26h-8V31L32 43 23 31v14z" fill="#fff"/>
+</svg>

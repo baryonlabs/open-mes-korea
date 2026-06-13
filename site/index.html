@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="한국 제조 현장에서 출발해 세계로 확장하는 오픈소스 MES. 현장 실행, LOT 추적, 제조 데이터 분석과 안전한 AI."
+    >
+    <meta name="theme-color" content="#08141f">
+    <meta property="og:title" content="Open MES Korea">
+    <meta
+      property="og:description"
+      content="작고 단단하며 확장 가능한 오픈소스 제조 실행 시스템"
+    >
+    <meta property="og:type" content="website">
+    <meta
+      property="og:url"
+      content="https://baryonlabs.github.io/open-mes-korea/"
+    >
+    <meta
+      property="og:image"
+      content="https://baryonlabs.github.io/open-mes-korea/assets/open-mes-factory-team.jpg"
+    >
+    <title>Open MES Korea</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-i18n="skip">본문으로 이동</a>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Open MES Korea home">
+        <img src="assets/mark.svg" width="34" height="34" alt="">
+        <span>Open MES Korea</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="#why" data-i18n="navWhy">프로젝트</a>
+        <a href="#core" data-i18n="navCore">핵심 기능</a>
+        <a href="#ai-modules" data-i18n="navAi">AI 모듈</a>
+        <a href="#architecture" data-i18n="navArchitecture">아키텍처</a>
+        <a href="#adoption-prompt" data-i18n="navPrompt">도입 검증</a>
+      </nav>
+
+      <div class="header-actions">
+        <label class="language-picker">
+          <span class="sr-only" data-i18n="language">언어</span>
+          <select id="language" aria-label="Language">
+            <option value="ko">한국어</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="zh">简体中文</option>
+          </select>
+        </label>
+        <a
+          class="github-link"
+          href="https://github.com/baryonlabs/open-mes-korea"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span>GitHub</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <span class="status-dot"></span>
+            <span data-i18n="heroStatus">설계 및 초기 구현 단계</span>
+          </div>
+          <h1>
+            <span data-i18n="heroTitle1">제조 현장을 이해하는</span>
+            <strong data-i18n="heroTitle2">작고 단단한 MES</strong>
+          </h1>
+          <p class="hero-description" data-i18n="heroDescription">
+            한국 제조 현장의 실제 흐름에서 출발해 다양한 국가, 언어,
+            업종으로 확장 가능한 오픈소스 제조 실행 시스템을 만듭니다.
+          </p>
+          <div class="hero-actions">
+            <a
+              class="button button-primary"
+              href="https://github.com/baryonlabs/open-mes-korea"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span data-i18n="viewGithub">GitHub에서 보기</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              class="button button-secondary"
+              href="https://github.com/baryonlabs/open-mes-korea/blob/main/docs/vision.md"
+              target="_blank"
+              rel="noreferrer"
+              data-i18n="readVision"
+            >비전 읽기</a>
+          </div>
+          <ul class="hero-principles" aria-label="Project principles">
+            <li><span>01</span><b data-i18n="principleSmall">Small core</b></li>
+            <li><span>02</span><b data-i18n="principleTrace">Trace everything</b></li>
+            <li><span>03</span><b data-i18n="principleExtend">Extend deliberately</b></li>
+          </ul>
+        </div>
+
+        <div class="hero-console" aria-label="Manufacturing flow preview">
+          <div class="console-bar">
+            <span></span><span></span><span></span>
+            <b>production.flow</b>
+          </div>
+          <div class="flow-list">
+            <div class="flow-item complete">
+              <span class="flow-index">01</span>
+              <div>
+                <b data-i18n="flowMaster">품목 · BOM · 공정</b>
+                <small>master_data.ready</small>
+              </div>
+              <i>✓</i>
+            </div>
+            <div class="flow-item active">
+              <span class="flow-index">02</span>
+              <div>
+                <b data-i18n="flowWorkOrder">작업지시 실행</b>
+                <small>work_order.in_progress</small>
+              </div>
+              <i class="pulse"></i>
+            </div>
+            <div class="flow-item">
+              <span class="flow-index">03</span>
+              <div>
+                <b data-i18n="flowResult">생산 · 불량 실적</b>
+                <small>result.awaiting_input</small>
+              </div>
+              <i>→</i>
+            </div>
+            <div class="flow-item">
+              <span class="flow-index">04</span>
+              <div>
+                <b data-i18n="flowLot">LOT 추적</b>
+                <small>genealogy.pending</small>
+              </div>
+              <i>→</i>
+            </div>
+            <div class="flow-item">
+              <span class="flow-index">05</span>
+              <div>
+                <b data-i18n="flowAnalysis">기본 분석</b>
+                <small>analytics.ready</small>
+              </div>
+              <i>→</i>
+            </div>
+          </div>
+          <div class="console-metrics">
+            <div><span data-i18n="metricIntegrity">이력성</span><b>100%</b></div>
+            <div><span data-i18n="metricLanguage">언어</span><b>4+</b></div>
+            <div><span data-i18n="metricCore">코어 원칙</span><b>MIN</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="statement" id="why">
+        <p class="section-label" data-i18n="whyLabel">WHY OPEN MES KOREA</p>
+        <h2 data-i18n="whyTitle">
+          ERP 전체가 아니라,<br>현장 실행의 빈틈을 해결합니다.
+        </h2>
+        <p data-i18n="whyDescription">
+          작업지시, 종이 작업일보, 엑셀, 바코드, 설비와 ERP에 흩어진
+          데이터를 연결합니다. 공정 진행, 불량 원인과 자재·제품 LOT의
+          관계를 하나의 추적 가능한 흐름으로 만듭니다.
+        </p>
+      </section>
+
+      <section class="golden-time">
+        <div class="golden-image">
+          <img
+            src="assets/open-mes-factory-team.jpg"
+            width="1672"
+            height="941"
+            loading="lazy"
+            alt="현장 작업자가 바코드와 태블릿으로 제조 데이터를 수집하고 분석하는 모습"
+            data-i18n-alt="goldenImageAlt"
+          >
+        </div>
+        <div class="golden-copy">
+          <p class="section-label" data-i18n="goldenLabel">PRESERVE THE DATA GOLDEN TIME</p>
+          <h2 data-i18n="goldenTitle">벤더를 고르는 동안에도,<br>현장 데이터는 사라집니다.</h2>
+          <p data-i18n="goldenDescription">
+            AI 도입의 첫 단계는 제품 비교가 아니라 지금 발생하는 작업,
+            품질, LOT와 설비 데이터를 축적하는 일입니다. Open MES Korea로
+            먼저 수집하고, 실제 데이터가 쌓인 뒤 적합한 분석 도구와 AI를
+            선택할 수 있습니다.
+          </p>
+          <ol>
+            <li><span>01</span><b data-i18n="goldenStep1">지금 데이터 수집</b></li>
+            <li><span>02</span><b data-i18n="goldenStep2">이력과 품질 확보</b></li>
+            <li><span>03</span><b data-i18n="goldenStep3">실제 데이터로 벤더·AI 검증</b></li>
+          </ol>
+          <p class="portable-note" data-i18n="goldenPortable">
+            PostgreSQL, CSV와 API로 이식 가능한 데이터를 유지해 특정
+            분석 제품에 종속되지 않습니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="pillars">
+        <article>
+          <span class="pillar-number">01</span>
+          <h3 data-i18n="pillarFieldTitle">현장 우선</h3>
+          <p data-i18n="pillarFieldBody">
+            태블릿, 바코드와 짧은 입력 흐름을 중심으로 작업자가 실제로
+            사용할 수 있는 경험을 설계합니다.
+          </p>
+        </article>
+        <article>
+          <span class="pillar-number">02</span>
+          <h3 data-i18n="pillarGlobalTitle">다국어 확장</h3>
+          <p data-i18n="pillarGlobalBody">
+            한국어를 기본으로 UI, 문서, 업무 용어와 국가별 규칙을
+            독립적으로 확장할 수 있게 만듭니다.
+          </p>
+        </article>
+        <article>
+          <span class="pillar-number">03</span>
+          <h3 data-i18n="pillarReliableTitle">안정적인 데이터</h3>
+          <p data-i18n="pillarReliableBody">
+            감사 로그, 중복 방지, 정정 이력과 명시적인 LOT genealogy로
+            제조 데이터의 신뢰를 지킵니다.
+          </p>
+        </article>
+        <article>
+          <span class="pillar-number">04</span>
+          <h3 data-i18n="pillarFastTitle">작고 빠른 코어</h3>
+          <p data-i18n="pillarFastBody">
+            공통 생산 흐름만 코어에 두고 업종별 기능과 연동은 확장으로
+            분리해 복잡성과 운영 부담을 낮춥니다.
+          </p>
+        </article>
+      </section>
+
+      <section class="core-section" id="core">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-i18n="coreLabel">CORE CAPABILITIES</p>
+            <h2 data-i18n="coreTitle">최소한으로 시작하고,<br>필요한 만큼 확장합니다.</h2>
+          </div>
+          <p data-i18n="coreDescription">
+            공통 생산 흐름과 데이터 무결성은 코어가 책임집니다. 특정
+            공장에만 필요한 기능은 명시적인 확장 지점으로 연결합니다.
+          </p>
+        </div>
+
+        <div class="capability-grid">
+          <article>
+            <div class="capability-icon">WO</div>
+            <h3 data-i18n="capExecutionTitle">생산 실행</h3>
+            <p data-i18n="capExecutionBody">
+              작업지시, 공정 시작·종료, 생산수량과 불량 기록
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon">LT</div>
+            <h3 data-i18n="capLotTitle">LOT 추적</h3>
+            <p data-i18n="capLotBody">
+              자재 투입부터 제품 LOT까지 양방향 genealogy
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon">DA</div>
+            <h3 data-i18n="capDataTitle">데이터 분석</h3>
+            <p data-i18n="capDataBody">
+              생산량, 불량률, 공정시간과 기간별 기본 분석
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon">EX</div>
+            <h3 data-i18n="capExtensionTitle">확장 경계</h3>
+            <p data-i18n="capExtensionBody">
+              REST, webhook, MQTT와 표준 제조 이벤트
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon">AU</div>
+            <h3 data-i18n="capAuditTitle">감사와 권한</h3>
+            <p data-i18n="capAuditBody">
+              모든 주요 쓰기의 actor, 변경 이력과 승인 기록
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon">AI</div>
+            <h3 data-i18n="capAiTitle">통제 가능한 AI</h3>
+            <p data-i18n="capAiBody">
+              읽기, 제안, 승인과 실행을 분리한 안전한 구조
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="architecture-section" id="architecture">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-i18n="architectureLabel">ARCHITECTURE</p>
+            <h2 data-i18n="architectureTitle">수집부터 분석까지,<br>단계적으로 확장합니다.</h2>
+          </div>
+          <p data-i18n="architectureDescription">
+            작은 공장은 PostgreSQL 중심으로 시작하고, 데이터가 늘어나면
+            Broadway 수집 계층과 telemetry 저장소를 독립적으로 추가합니다.
+          </p>
+        </div>
+
+        <div class="architecture-diagram">
+          <div class="arch-column">
+            <span class="arch-label" data-i18n="archSource">DATA SOURCE</span>
+            <div class="arch-node"><b data-i18n="archOperator">작업자</b><small>Tablet · Barcode</small></div>
+            <div class="arch-node"><b data-i18n="archEquipment">설비</b><small>PLC · Sensor</small></div>
+            <div class="arch-node"><b data-i18n="archExternal">외부 시스템</b><small>ERP · CSV · API</small></div>
+          </div>
+          <div class="arch-arrow" aria-hidden="true">→</div>
+          <div class="arch-column highlighted">
+            <span class="arch-label" data-i18n="archCore">OPEN MES CORE</span>
+            <div class="arch-node"><b>Web / API</b><small>Auth · Validation</small></div>
+            <div class="arch-node"><b>MES Domain</b><small>Work · Quality · LOT</small></div>
+            <div class="arch-node"><b>PostgreSQL</b><small>Audit · Outbox</small></div>
+          </div>
+          <div class="arch-arrow" aria-hidden="true">→</div>
+          <div class="arch-column">
+            <span class="arch-label" data-i18n="archExtension">EXTENSIONS</span>
+            <div class="arch-node"><b>Broadway</b><small>High-throughput</small></div>
+            <div class="arch-node"><b>Telemetry</b><small>Timescale · ClickHouse</small></div>
+            <div class="arch-node"><b>AI Context</b><small>Read · Suggest · Approve</small></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ai-section" id="ai-modules">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-i18n="aiLabel">MANUFACTURING AI MODULES</p>
+            <h2 data-i18n="aiTitle">예지보전을 넘어,<br>공정 전체로 확장합니다.</h2>
+          </div>
+          <p data-i18n="aiDescription">
+            AI 기능은 코어에 한꺼번에 넣지 않습니다. 데이터 준비도, ROI와
+            위험을 검증한 뒤 독립 모듈로 연결합니다.
+          </p>
+        </div>
+
+        <div class="ai-module-grid">
+          <article><span>01 / QUALITY</span><h3 data-i18n="aiVisionTitle">비전 검사</h3><p data-i18n="aiVisionBody">외관, 치수, 조립과 내부 결함 후보 탐지</p></article>
+          <article><span>02 / SIMULATION</span><h3 data-i18n="aiVirtualTitle">가상 계측·시운전</h3><p data-i18n="aiVirtualBody">센서 기반 품질 예측과 디지털 트윈 검증</p></article>
+          <article><span>03 / PROCESS</span><h3 data-i18n="aiOptimizeTitle">공정 최적화</h3><p data-i18n="aiOptimizeBody">공정 변수, 수율과 에너지 최적 조건 제안</p></article>
+          <article><span>04 / LOGISTICS</span><h3 data-i18n="aiLogisticsTitle">자율 물류</h3><p data-i18n="aiLogisticsBody">AMR·AGV 경로와 비전 피킹 연동</p></article>
+          <article><span>05 / PLANNING</span><h3 data-i18n="aiPlanningTitle">예측·스케줄링</h3><p data-i18n="aiPlanningBody">수요, 재고와 APS 작업 우선순위 최적화</p></article>
+          <article><span>06 / EQUIPMENT</span><h3 data-i18n="aiMaintenanceTitle">예지보전</h3><p data-i18n="aiMaintenanceBody">설비 이상, 고장 가능성과 점검 시점 제안</p></article>
+          <article><span>07 / SAFETY</span><h3 data-i18n="aiSafetyTitle">작업자 안전</h3><p data-i18n="aiSafetyBody">보호구, 위험구역과 위험 행동 감지 후보</p></article>
+          <article><span>08 / KNOWLEDGE</span><h3 data-i18n="aiLlmTitle">제조 LLM</h3><p data-i18n="aiLlmBody">매뉴얼, 작업표준 검색과 오류 대응 보조</p></article>
+        </div>
+        <div class="safety-note">
+          <b data-i18n="safetyNoteTitle">고위험 기능 원칙</b>
+          <p data-i18n="safetyNoteBody">
+            설비 제어, 품질 판정과 안전 경보는 AI가 단독 확정하지 않습니다.
+            현장 검증, fail-safe, 사람의 승인과 감사 로그를 요구합니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="roadmap-section" id="roadmap">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-i18n="roadmapLabel">ROADMAP</p>
+            <h2 data-i18n="roadmapTitle">현재는 기반을<br>단단하게 만드는 단계입니다.</h2>
+          </div>
+          <p data-i18n="roadmapDescription">
+            구현과 현장 검증 결과에 따라 순서를 조정합니다. 기능 수보다
+            실제로 작동하는 생산 흐름을 우선합니다.
+          </p>
+        </div>
+
+        <ol class="roadmap">
+          <li class="done">
+            <span>00</span>
+            <div><b data-i18n="phase0">비전과 아키텍처</b><small data-i18n="complete">완료</small></div>
+          </li>
+          <li class="current">
+            <span>01</span>
+            <div><b data-i18n="phase1">MES Core</b><small data-i18n="inProgress">진행 중</small></div>
+          </li>
+          <li>
+            <span>02</span>
+            <div><b data-i18n="phase2">LOT Traceability</b><small data-i18n="planned">계획</small></div>
+          </li>
+          <li>
+            <span>03</span>
+            <div><b data-i18n="phase3">Shop-floor UX</b><small data-i18n="planned">계획</small></div>
+          </li>
+          <li>
+            <span>04</span>
+            <div><b data-i18n="phase4">데이터 수집과 분석</b><small data-i18n="planned">계획</small></div>
+          </li>
+          <li>
+            <span>05</span>
+            <div><b data-i18n="phase5">AI와 확장 연동</b><small data-i18n="planned">계획</small></div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="prompt-section" id="adoption-prompt">
+        <div class="prompt-copy">
+          <p class="section-label" data-i18n="promptLabel">LLM-ASSISTED VALIDATION</p>
+          <h2 data-i18n="promptTitle">공장 기술도입을<br>LLM과 함께 검증하세요.</h2>
+          <p data-i18n="promptDescription">
+            공장 규모, LOT 요구, 설비 연결, 데이터 준비도와 핵심 병목을
+            입력하면 LLM이 최소 PoC, 인프라, AI 모듈 우선순위와 위험을
+            구조적으로 검토하도록 만든 공개 프롬프트입니다.
+          </p>
+          <ul>
+            <li data-i18n="promptPoint1">코어·확장·외부 시스템 책임 분류</li>
+            <li data-i18n="promptPoint2">서버·저장장치·네트워크 초안</li>
+            <li data-i18n="promptPoint3">AI 모듈 가치·데이터·위험 평가</li>
+            <li data-i18n="promptPoint4">30/60/90일 PoC 실행 계획</li>
+          </ul>
+          <div class="hero-actions">
+            <a class="button button-primary" href="ai-adoption-prompt.txt" target="_blank" data-i18n="openPrompt">전체 프롬프트 열기</a>
+            <button class="button button-dark" id="copy-prompt" type="button" data-i18n="copyPrompt">프롬프트 복사</button>
+          </div>
+        </div>
+        <div class="prompt-terminal">
+          <div class="console-bar"><span></span><span></span><span></span><b>adoption.review</b></div>
+          <pre><code><span class="code-comment"># Factory context</span>
+industry: <span class="code-value">[your industry]</span>
+production_mode: <span class="code-value">[job shop / batch]</span>
+primary_kpi: <span class="code-value">[defect / downtime]</span>
+data_sources:
+  - work_orders
+  - lot_history
+  - equipment_events
+
+validate:
+  - core_fit
+  - infrastructure
+  - data_readiness
+  - ai_module_priority
+  - safety_and_risk
+
+output:
+  - minimum_poc
+  - 30_60_90_plan</code></pre>
+          <div class="llm-links">
+            <a href="llms.txt">llms.txt <span>↗</span></a>
+            <a href="llm.txt">llm.txt <span>↗</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div>
+          <p class="section-label" data-i18n="ctaLabel">BUILD WITH US</p>
+          <h2 data-i18n="ctaTitle">제조 현장에 필요한<br>최소 MES를 함께 만듭니다.</h2>
+        </div>
+        <div class="cta-copy">
+          <p data-i18n="ctaDescription">
+            제조 실무, Elixir/Phoenix, PostgreSQL, 현장 UX, 설비 연동과
+            다국어 경험을 가진 기여자를 찾고 있습니다.
+          </p>
+          <div class="hero-actions">
+            <a
+              class="button button-light"
+              href="https://github.com/baryonlabs/open-mes-korea"
+              target="_blank"
+              rel="noreferrer"
+              data-i18n="joinProject"
+            >프로젝트 참여하기</a>
+            <a
+              class="button button-outline-light"
+              href="https://github.com/baryonlabs/open-mes-korea/blob/main/CONTRIBUTING.md"
+              target="_blank"
+              rel="noreferrer"
+              data-i18n="contributionGuide"
+            >기여 가이드</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand" href="#top">
+        <img src="assets/mark.svg" width="30" height="30" alt="">
+        <span>Open MES Korea</span>
+      </a>
+      <p data-i18n="footerStatus">Open source · Early implementation</p>
+      <div>
+        <a href="https://github.com/baryonlabs/open-mes-korea">GitHub</a>
+        <a href="https://github.com/baryonlabs/open-mes-korea/tree/main/docs" data-i18n="docs">문서</a>
+        <a href="https://github.com/baryonlabs/open-mes-korea/blob/main/CONTRIBUTING.md" data-i18n="contribute">기여</a>
+      </div>
+    </footer>
+  </body>
+</html>

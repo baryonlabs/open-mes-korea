@@ -1,0 +1,2 @@
+The canonical LLM information file for Open MES Korea is:
+https://baryonlabs.github.io/open-mes-korea/llms.txt
