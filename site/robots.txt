@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://baryonlabs.github.io/open-mes-korea/sitemap.xml
