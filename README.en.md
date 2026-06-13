@@ -64,6 +64,22 @@ of restarting data collection after a long selection process.
 - **Operator-first:** Prioritize tablets, barcodes, and short input flows
 - **Safe AI:** Separate reading, suggestions, approval, and execution
 
+## Deployable Data Sovereignty
+
+Open MES Korea is designed as installable open-source software, not a SaaS
+service that requires production data to be sent to a specific cloud.
+
+- Run the MES and database inside the factory network or a private cloud
+- Keep production, lot, quality, and equipment data in operator-selected storage
+- Support restricted internet access and segmented OT networks
+- Enable external AI, email, analytics, and ERP integrations only by configuration
+- Keep PLC command write disabled by default
+
+A default installation does not intentionally send production data to an
+external service or control equipment. Open source and on-premises deployment
+do not guarantee security by themselves; firewalls, identities, TLS, secrets,
+backups, patching, and installed extensions must still be operated correctly.
+
 ## Core Workflow
 
 ```text

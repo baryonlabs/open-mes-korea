@@ -7,6 +7,8 @@
 Canonical site: https://baryonlabs.github.io/open-mes-korea/
 Source repository: https://github.com/baryonlabs/open-mes-korea
 Default language: Korean
+Supported website languages: Korean, English, Japanese, Simplified Chinese,
+German, Vietnamese, Thai, Indonesian, Spanish, Brazilian Portuguese
 Project status: Design and early implementation; not production-ready
 
 ## Purpose
@@ -33,6 +35,18 @@ functions.
 - Separate AI read, suggest, approve, and execute permissions.
 - Never treat raw equipment events as confirmed production records without
   domain validation.
+- Allow on-premises or private-network deployment without mandatory production
+  data transfer to an external SaaS service.
+
+## Data sovereignty
+
+The default architecture can run inside a factory or private network. External
+AI, email, ERP, and analytics integrations are optional and must be explicitly
+configured. PLC command writes are disabled by default.
+
+Open source and on-premises deployment do not guarantee security automatically.
+Operators remain responsible for firewalls, identities, TLS, secret handling,
+backups, patching, and extension configuration.
 
 ## Core
 

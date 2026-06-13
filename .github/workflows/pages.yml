@@ -39,3 +39,9 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Notify IndexNow
+        continue-on-error: true
+        run: |
+          curl --fail --silent --show-error --retry 3 \
+            "https://api.indexnow.org/indexnow?url=https%3A%2F%2Fbaryonlabs.github.io%2Fopen-mes-korea%2F&key=5104afde7a98c20355688669b6d2d1f3&keyLocation=https%3A%2F%2Fbaryonlabs.github.io%2Fopen-mes-korea%2F5104afde7a98c20355688669b6d2d1f3.txt"

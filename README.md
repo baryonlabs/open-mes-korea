@@ -2,18 +2,25 @@
 
 # Open MES Korea
 
-**현장을 이해하는 작고 단단한 오픈소스 MES**
+**제조 현장을 위한 작고 단단한 오픈소스 MES**
 
 한국 제조 현장의 실제 업무 흐름에서 출발해
 다양한 국가, 언어, 업종으로 확장 가능한 제조 실행 시스템을 만듭니다.
 
 [English](README.en.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md)
 
+[공식 웹사이트](https://baryonlabs.github.io/open-mes-korea/) ·
+[마켓플레이스](https://baryonlabs.github.io/open-mes-korea/#marketplace) ·
+[도입 가이드](docs/adoption/README.md) ·
 [비전](docs/vision.md) · [MVP](docs/mvp-scope.md) ·
 [아키텍처](docs/system-architecture.md) · [로드맵](docs/roadmap.md) ·
 [기여하기](CONTRIBUTING.md)
 
 </div>
+
+[![Deploy GitHub Pages](https://github.com/baryonlabs/open-mes-korea/actions/workflows/pages.yml/badge.svg)](https://github.com/baryonlabs/open-mes-korea/actions/workflows/pages.yml)
+[![GitHub issues](https://img.shields.io/github/issues/baryonlabs/open-mes-korea)](https://github.com/baryonlabs/open-mes-korea/issues)
+[![GitHub discussions](https://img.shields.io/github/discussions/baryonlabs/open-mes-korea)](https://github.com/baryonlabs/open-mes-korea/discussions)
 
 > [!IMPORTANT]
 > Open MES Korea는 현재 설계 및 초기 구현 단계입니다. 운영 환경에 바로
@@ -73,6 +80,24 @@ AI 계획이 없어도 작업자 입력, 바코드, CSV와 표준 수집 API로 
 - **빠른 응답:** 현장 입력과 조회에 불필요한 복잡성을 넣지 않는 구조
 - **현장 우선:** 태블릿, 바코드와 짧은 입력 흐름을 우선
 - **안전한 AI:** 읽기, 제안, 승인과 실행 권한을 분리
+
+## 설치형 데이터 주권
+
+Open MES Korea는 특정 SaaS 클라우드에 생산 데이터를 의무적으로 보내는
+서비스가 아니라, 공장 서버나 사설 클라우드에 직접 설치할 수 있는
+오픈소스 소프트웨어를 지향합니다.
+
+- MES와 데이터베이스를 공장 내부망에서 운영 가능
+- 생산실적, LOT, 품질과 설비 데이터를 운영자가 선택한 저장소에 보관
+- 인터넷이 제한된 환경과 분리된 OT 네트워크를 고려
+- 외부 AI, 메일, 분석, ERP 연동은 명시적으로 설정할 때만 활성화
+- 외부 연동별 전송 데이터, 권한과 감사 이력을 운영자가 통제
+- PLC command write는 기본 비활성화하고 안전 검토 후 제한적으로 허용
+
+따라서 기본 설치만으로 외부 서비스에 생산 데이터를 전송하거나 설비를
+제어하지 않습니다. 다만 오픈소스·온프레미스라는 사실만으로 보안이
+자동 보장되는 것은 아닙니다. 실제 안전성은 방화벽, 계정 권한, TLS,
+비밀정보 관리, 백업, 패치와 설치한 확장 모듈의 설정에 따라 달라집니다.
 
 ## 핵심 흐름
 
@@ -319,6 +344,8 @@ LLM과 함께 도입 준비도를 점검하려면 공개 사이트의
 | [Market Research](docs/market-research.md) | 시장과 오픈소스 분석 |
 | [IoT Strategy](docs/iot-connectivity-open-source-strategy.md) | 설비 연결 전략 |
 | [Adoption Guide](docs/adoption/README.md) | 제조사 도입 검토 |
+| [Search & Discovery](docs/search-discovery-guide.md) | 검색엔진 등록과 저장소 발견성 운영 |
+| [Domain Strategy](docs/domain-strategy.md) | 공식 도메인 선택과 연결 기준 |
 
 ## 라이선스
 

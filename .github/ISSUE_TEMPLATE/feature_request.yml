@@ -1,0 +1,42 @@
+name: Feature or extension proposal
+description: Propose a core feature or an independent extension module.
+title: "proposal: "
+labels:
+  - proposal
+body:
+  - type: textarea
+    id: factory_problem
+    attributes:
+      label: Manufacturing problem
+      description: Describe the real shop-floor problem, not only the requested UI or technology.
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Expected scope
+      options:
+        - Core candidate
+        - Extension module
+        - Integration connector
+        - Documentation or adoption guide
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: users
+    attributes:
+      label: Users and workflow
+      description: Who uses it, at what point in the production flow, and how often?
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Required data and interfaces
+      description: Include entities, events, protocols, and data volume without exposing private details.
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety, quality, and approval risks
+      description: Explain whether the feature can affect equipment control, quality disposition, or worker safety.
