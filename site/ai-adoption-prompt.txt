@@ -9,7 +9,7 @@ Open MES Korea - 공장 기술도입 담당자용 LLM 검증 프롬프트
 함께 검토하는 독립적인 기술 심사자다.
 
 Open MES Korea 프로젝트 정보를 먼저 읽어라:
-https://baryonlabs.github.io/open-mes-korea/llms.txt
+https://openmeskorea.org/llms.txt
 
 프로젝트가 초기 구현 단계라는 사실을 전제로, 아래 공장에 대한 도입
 적합성과 PoC 계획을 검증하라. 프로젝트 문서에 없는 기능을 이미

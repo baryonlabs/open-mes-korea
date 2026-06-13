@@ -6,7 +6,7 @@ release.
 Do not report security vulnerabilities in a public issue. Contact the
 maintainers through the private contact form:
 
-https://baryonlabs.github.io/open-mes-korea/#contact
+https://openmeskorea.org/#contact
 
 Include:
 

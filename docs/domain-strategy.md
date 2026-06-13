@@ -40,7 +40,7 @@ open-mes.org
 이미 검색 결과에 존재한다. 짧은 `openmes.*` 주소는 기존 프로젝트와
 혼동될 가능성이 높고, 특히 `.io`는 갱신 비용도 높은 편이다.
 
-## 도메인 연결 후 변경할 항목
+## 도메인 연결 체크리스트
 
 1. GitHub Pages custom domain과 `CNAME`
 2. HTTPS 인증서와 강제 HTTPS
@@ -68,23 +68,20 @@ www.openmeskorea.org
 실제 DNS 레코드는 GitHub Pages에 custom domain을 등록할 때 표시되는
 최신 값을 사용한다.
 
-## 등록 전 확인
+## 운영 확인
 
-- 최종 결제 화면에서 도메인이 실제 등록 가능한가?
-- 일반 가격인가, premium 가격인가?
-- 첫해 가격이 아니라 갱신 가격은 얼마인가?
-- WHOIS privacy, DNSSEC와 2단계 인증을 지원하는가?
+- 자동 갱신과 결제 수단이 정상인가?
+- WHOIS privacy, DNSSEC와 2단계 인증이 활성화되어 있는가?
 - 조직 계정으로 소유권과 자동 갱신을 관리하는가?
 - 결제와 복구 연락처가 개인 한 명에게만 묶이지 않는가?
 
-## 확인 당시 상태
+## 등록 상태
 
-WHOIS, RDAP와 DNS 조회에서 다음 도메인에 등록 또는 DNS 정보가 확인되지
-않았다. 이 결과는 예약을 보장하지 않으며 언제든 바뀔 수 있다.
+`openmeskorea.org`는 2026-06-13 Cloudflare Registrar를 통해 등록했다.
+공식 사이트와 모든 canonical URL은 이 도메인을 사용한다.
 
-- `openmeskorea.org`
-- `openmeskorea.com`
-- `openmes.kr`
+`openmeskorea.com`과 `openmes.kr`은 선택적인 브랜드 보호 도메인으로
+남겨 둔다.
 
 ## 참고
 

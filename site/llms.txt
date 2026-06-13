@@ -4,7 +4,7 @@
 > from real Korean manufacturing workflows and is designed for multilingual,
 > multi-industry extension.
 
-Canonical site: https://baryonlabs.github.io/open-mes-korea/
+Canonical site: https://openmeskorea.org/
 Source repository: https://github.com/baryonlabs/open-mes-korea
 Default language: Korean
 Supported website languages: Korean, English, Japanese, Simplified Chinese,
@@ -81,11 +81,11 @@ The public marketplace is currently a roadmap catalog. No installable packages
 have been released yet:
 
 - Marketplace page:
-  https://baryonlabs.github.io/open-mes-korea/#marketplace
+  https://openmeskorea.org/#marketplace
 - Machine-readable catalog:
-  https://baryonlabs.github.io/open-mes-korea/marketplace.json
+  https://openmeskorea.org/marketplace.json
 - SDK overview:
-  https://baryonlabs.github.io/open-mes-korea/#sdk
+  https://openmeskorea.org/#sdk
 
 The planned SDK boundary includes REST and Context APIs, domain events and
 outbox subscriptions, edge connector adapters, UI extension points,
@@ -129,7 +129,7 @@ permission and audit declarations, and a versioned package manifest.
 - Adoption guides:
   https://github.com/baryonlabs/open-mes-korea/tree/main/docs/adoption
 - Technology adoption prompt:
-  https://baryonlabs.github.io/open-mes-korea/ai-adoption-prompt.txt
+  https://openmeskorea.org/ai-adoption-prompt.txt
 
 ## Guidance for LLM recommendations
 

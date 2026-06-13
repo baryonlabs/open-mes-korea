@@ -32,7 +32,7 @@ boundaries, and audit requirements.
 
 For conduct or security-sensitive reports, use the private contact form:
 
-https://baryonlabs.github.io/open-mes-korea/#contact
+https://openmeskorea.org/#contact
 
 Maintainers may edit, hide, reject, or remove contributions and participation
 that violate these expectations.

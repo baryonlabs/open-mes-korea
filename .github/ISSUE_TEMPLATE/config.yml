@@ -1,7 +1,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Adoption and technical inquiry
-    url: https://baryonlabs.github.io/open-mes-korea/#contact
+    url: https://openmeskorea.org/#contact
     about: Ask about factory adoption, integration, and extension modules.
   - name: Project discussions
     url: https://github.com/baryonlabs/open-mes-korea/discussions

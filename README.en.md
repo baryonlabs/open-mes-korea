@@ -220,9 +220,9 @@ Verified installation instructions and Docker Compose files will be added
 after the first runnable scaffold is complete.
 
 Factory technology owners can use the public
-[AI adoption validation prompt](https://baryonlabs.github.io/open-mes-korea/#adoption-prompt)
+[AI adoption validation prompt](https://openmeskorea.org/#adoption-prompt)
 with an LLM. The site also publishes
-[`llms.txt`](https://baryonlabs.github.io/open-mes-korea/llms.txt).
+[`llms.txt`](https://openmeskorea.org/llms.txt).
 
 ## Roadmap
 

@@ -3,7 +3,7 @@
 Open MES Korea 공식 사이트:
 
 ```text
-https://baryonlabs.github.io/open-mes-korea/
+https://openmeskorea.org/
 ```
 
 ## 현재 준비된 항목
@@ -21,21 +21,22 @@ https://baryonlabs.github.io/open-mes-korea/
 
 ## Google Search Console
 
-GitHub Pages 프로젝트 사이트는 경로가 포함되므로 **URL 접두어 속성**으로
-다음 주소를 정확히 등록한다.
+전용 도메인은 **도메인 속성**으로 등록하는 것을 권장한다. Cloudflare
+DNS에 Search Console이 제공하는 TXT 레코드를 추가하면 모든 프로토콜과
+하위 도메인을 함께 관리할 수 있다.
 
 ```text
-https://baryonlabs.github.io/open-mes-korea/
+https://openmeskorea.org/
 ```
 
 1. Search Console에서 속성 추가를 선택한다.
-2. URL 접두어 방식으로 위 전체 주소를 입력한다.
-3. HTML 태그 또는 HTML 파일 방식으로 소유권을 확인한다.
+2. 도메인 방식으로 `openmeskorea.org`를 입력한다.
+3. 발급된 TXT 레코드를 Cloudflare DNS에 추가해 소유권을 확인한다.
 4. 발급받은 값은 공개 이슈에 올리지 말고 저장소 관리자가 직접 추가한다.
 5. 아래 sitemap을 제출한다.
 
 ```text
-https://baryonlabs.github.io/open-mes-korea/sitemap.xml
+https://openmeskorea.org/sitemap.xml
 ```
 
 6. URL 검사에서 공식 사이트 URL의 색인 생성을 요청한다.
@@ -50,16 +51,7 @@ https://baryonlabs.github.io/open-mes-korea/sitemap.xml
 
 ## 네이버 서치어드바이저
 
-네이버는 사이트 등록을 호스트 단위로 지원한다. 현재 주소는
-`baryonlabs.github.io` 아래의 프로젝트 경로이므로 프로젝트 경로만 별도
-사이트로 등록하기 어렵다.
-
-한국 검색 노출을 본격 운영하려면 다음 중 하나가 필요하다.
-
-1. Open MES Korea 전용 도메인을 연결한다.
-2. `baryonlabs.github.io` 루트 사이트의 소유권을 확인하고 운영한다.
-
-전용 도메인을 연결한 뒤:
+네이버 서치어드바이저에는 전용 도메인을 사이트로 등록한다.
 
 - 사이트 등록 및 HTML 소유 확인
 - sitemap 제출
@@ -71,13 +63,11 @@ https://baryonlabs.github.io/open-mes-korea/sitemap.xml
 IndexNow는 변경된 URL을 참여 검색엔진에 알릴 수 있다. 사이트 호스트의
 소유권을 키 파일로 증명해야 한다.
 
-현재처럼 GitHub Pages 하위 경로를 사용할 때보다 전용 도메인을 연결한
-뒤 적용하는 편이 운영과 소유권 관리가 명확하다.
+배포 워크플로가 변경된 공식 URL을 IndexNow에 자동으로 알린다.
 
-## 전용 도메인 권장
+## 전용 도메인 운영
 
-검색 브랜드를 장기 운영하려면 GitHub Pages 기본 경로보다 전용 도메인이
-유리하다.
+공식 도메인은 `openmeskorea.org`이며 GitHub Pages에 연결한다.
 
 - 검색엔진 소유권 확인이 단순해진다.
 - 네이버 호스트 단위 등록이 가능하다.
@@ -85,8 +75,8 @@ IndexNow는 변경된 URL을 참여 검색엔진에 알릴 수 있다. 사이트
 - 향후 사이트 플랫폼을 바꿔도 주소를 유지할 수 있다.
 - 이메일과 프로젝트 브랜드를 같은 도메인으로 통합할 수 있다.
 
-도메인을 연결할 경우 canonical, Open Graph URL, sitemap, robots,
-`llms.txt`의 절대 주소를 모두 새 도메인으로 변경해야 한다.
+canonical, Open Graph URL, sitemap, robots, `llms.txt`, IndexNow의
+절대 주소는 모두 공식 도메인을 사용한다.
 
 ## GitHub 발견성 운영
 
