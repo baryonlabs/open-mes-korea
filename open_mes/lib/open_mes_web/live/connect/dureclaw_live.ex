@@ -19,16 +19,28 @@ defmodule OpenMesWeb.Connect.DureClawLive do
         end
       end
   """
-  use OpenMesWeb, :live_view
+  # 공통 admin 셸(사이드바·상단바·role 배지) + on_mount(current_actor/role/path 주입).
+  # 카탈로그/애드온과 동일한 OMK 레이아웃을 따른다.
+  use OpenMesWeb.Admin.AdminLive
 
   alias OpenMes.Connect.DureClaw
 
   @poll_ms 3000
 
+  @default_prompt "LOT A-2026-1031 외관 불량 원인을 역할별로 분석해줘 (비전 점수·LOT 계보·엣지 이미지)"
+
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket), do: Process.send_after(self(), :poll, @poll_ms)
-    {:ok, assign(socket, page_title: "DureClaw 분산 오케스트레이션", snap: DureClaw.snapshot())}
+
+    {:ok,
+     assign(socket,
+       page_title: "DureClaw 분산 오케스트레이션",
+       snap: DureClaw.snapshot(),
+       prompt: @default_prompt,
+       dstatus: :idle,
+       dispatch: nil
+     )}
   end
 
   @impl true
@@ -37,9 +49,50 @@ defmodule OpenMesWeb.Connect.DureClawLive do
     {:noreply, assign(socket, snap: DureClaw.snapshot())}
   end
 
+  # 비동기 fan-out/fan-in 완료
+  def handle_info({:dispatch_done, result}, socket) do
+    {:noreply, assign(socket, dstatus: :dispatched, dispatch: result)}
+  end
+
   @impl true
   def handle_event("refresh", _params, socket),
     do: {:noreply, assign(socket, snap: DureClaw.snapshot())}
+
+  # Approval Flow: propose → approve → execute(fan-out) → 수집
+  def handle_event("propose_dispatch", %{"prompt" => prompt}, socket) do
+    if String.trim(prompt) == "" do
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, prompt: prompt, dstatus: :proposed)}
+    end
+  end
+
+  def handle_event("cancel_dispatch", _p, socket), do: {:noreply, assign(socket, dstatus: :idle)}
+
+  def handle_event("approve_dispatch", _p, socket) do
+    pid = self()
+    prompt = socket.assigns.prompt
+    Task.start(fn -> send(pid, {:dispatch_done, DureClaw.dispatch_analysis(prompt)}) end)
+    {:noreply, assign(socket, dstatus: :dispatching)}
+  end
+
+  # task.result 본문에서 사람이 읽을 요약 추출 (sim=ack, 실에이전트=emits/summary).
+  defp result_summary(nil), do: "(응답 없음 — 타임아웃)"
+
+  defp result_summary(%{} = r) do
+    rich =
+      r
+      |> Map.drop(["task_id", "from", "event", "ts", "to", "status", "summary", "latency_ms"])
+      |> Enum.map(fn {k, v} -> "#{k}=#{inspect(v)}" end)
+
+    cond do
+      rich != [] -> Enum.join(rich, " · ")
+      r["summary"] -> r["summary"]
+      true -> "완료"
+    end
+  end
+
+  defp result_summary(_), do: "완료"
 
   defp role_icon("executor"), do: "🤖"
   defp role_icon("builder"), do: "🏗️"
@@ -50,16 +103,22 @@ defmodule OpenMesWeb.Connect.DureClawLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-4xl px-4 py-8">
-      <header class="mb-6 flex items-start justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-zinc-900">🔌 DureClaw 분산 오케스트레이션</h1>
-          <p class="mt-1 text-sm text-zinc-500">
-            분산 에이전트 협력 버스의 fleet 을 관측합니다(읽기 전용 · 3초 라이브).
-          </p>
-        </div>
-        <.link navigate="/extensions" class="text-sm text-blue-600 hover:underline">← 확장 카탈로그</.link>
-      </header>
+    <.admin_shell
+      current_path={@current_path}
+      current_actor={@current_actor}
+      current_role={@current_role}
+      flash={@flash}
+    >
+      <.page_header
+        title="DureClaw 분산 오케스트레이션"
+        subtitle="분산 에이전트 협력 버스의 fleet 을 관측합니다(읽기 전용 · 3초 라이브)."
+      />
+
+      <div class="flex justify-end">
+        <.link navigate="/extensions" class="text-sm text-blue-600 hover:underline">
+          ← 확장 카탈로그
+        </.link>
+      </div>
 
       <%!-- 연결 상태 --%>
       <div class={[
@@ -84,6 +143,102 @@ defmodule OpenMesWeb.Connect.DureClawLive do
         </button>
       </div>
 
+      <%!-- 분석 지시 (Approval Flow: propose → approve → fan-out → 수집) --%>
+      <div :if={@snap.connected} class="mb-6 rounded-lg border border-indigo-200 bg-indigo-50/40 p-4">
+        <div class="text-sm font-semibold text-zinc-800">분석 지시 — fleet fan-out</div>
+        <div class="text-xs text-zinc-500">
+          자유 프롬프트를 온라인 {length(@snap.agents)}개 에이전트에 동시 지시합니다(승인 후 실행).
+        </div>
+
+        <%!-- 프롬프트 입력 (idle) --%>
+        <form :if={@dstatus == :idle} phx-submit="propose_dispatch" class="mt-3">
+          <textarea
+            name="prompt"
+            rows="2"
+            placeholder="에이전트에 보낼 지시를 자유롭게 입력…"
+            class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+          >{@prompt}</textarea>
+          <div class="mt-2 flex justify-end">
+            <button
+              type="submit"
+              disabled={@snap.agents == []}
+              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40"
+            >
+              분석 지시 →
+            </button>
+          </div>
+        </form>
+
+        <%!-- propose --%>
+        <div :if={@dstatus == :proposed} class="mt-3 rounded-md border border-indigo-200 bg-white p-3">
+          <p class="text-sm text-zinc-700">
+            <span class="font-semibold">제안(propose)</span>
+            — 이 프롬프트를 실행할까요? 지시는 <span class="font-semibold">승인 후 실행</span>됩니다(직접 실행 X).
+          </p>
+          <pre class="mt-2 whitespace-pre-wrap rounded bg-zinc-50 p-2 text-xs text-zinc-700">{@prompt}</pre>
+          <div class="mt-1 text-xs text-zinc-500">
+            대상: <span :for={a <- @snap.agents} class="font-mono">{a["name"]}</span>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button
+              phx-click="approve_dispatch"
+              class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
+            >
+              승인 → 지시 실행
+            </button>
+            <button
+              phx-click="cancel_dispatch"
+              class="rounded-lg border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+
+        <%!-- dispatching --%>
+        <div :if={@dstatus == :dispatching} class="mt-3 animate-pulse text-sm text-zinc-500">
+          ▶ fan-out 지시 전송 + 결과 수집(fan-in) 중…
+        </div>
+
+        <%!-- 에러 --%>
+        <div
+          :if={@dstatus == :dispatched and not is_map(@dispatch)}
+          class="mt-3 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700"
+        >
+          지시 실패: {inspect(@dispatch)}
+          <button phx-click="cancel_dispatch" class="ml-2 underline">다시</button>
+        </div>
+
+        <%!-- dispatched: fan-in 결과 --%>
+        <div
+          :if={@dstatus == :dispatched and is_map(@dispatch)}
+          class="mt-3 rounded-md border border-emerald-200 bg-white p-3"
+        >
+          <div class="mb-2 text-sm font-semibold text-zinc-800">
+            ✅ 지시 완료 · fan-in 수집 (work_key <span class="font-mono text-xs">{@dispatch.work_key}</span>)
+          </div>
+          <div class="space-y-1">
+            <div :for={d <- @dispatch.dispatched} class="flex items-start gap-2 text-xs">
+              <span class="font-mono font-semibold text-zinc-700">{role_icon(d.role)} {d.agent}</span>
+              <span class="text-zinc-400">→</span>
+              <span class="text-zinc-600">
+                {result_summary(d.result)}
+              </span>
+            </div>
+          </div>
+          <p class="mt-2 text-[11px] text-zinc-400">
+            sim 에이전트는 ack 응답만 반환합니다. 실제 데이터(비전 점수·LOT 계보)는 물리 에이전트(Pi·GPU)가
+            실작업하거나 시나리오 emits 주입 시 수집됩니다.
+          </p>
+          <button
+            phx-click="cancel_dispatch"
+            class="mt-2 text-xs text-zinc-500 underline hover:text-zinc-700"
+          >
+            다시
+          </button>
+        </div>
+      </div>
+
       <%!-- 온라인 에이전트 --%>
       <h2 class="mb-2 text-sm font-semibold text-zinc-700">
         온라인 에이전트 <span class="text-zinc-400">({length(@snap.agents)})</span>
@@ -95,10 +250,7 @@ defmodule OpenMesWeb.Connect.DureClawLive do
         연결된 에이전트 없음 — fleet(엣지 Pi·시뮬 워커)이 버스에 JOIN 하면 여기 표시됩니다.
       </div>
       <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div
-          :for={a <- @snap.agents}
-          class="rounded-lg border border-zinc-200 bg-white p-4"
-        >
+        <div :for={a <- @snap.agents} class="rounded-lg border border-zinc-200 bg-white p-4">
           <div class="flex items-center justify-between">
             <span class="font-mono font-semibold text-zinc-900">
               {role_icon(a["role"])} {a["name"]}
@@ -131,7 +283,7 @@ defmodule OpenMesWeb.Connect.DureClawLive do
           {if is_map(wk), do: wk["work_key"] || wk["key"], else: wk}
         </span>
       </div>
-    </div>
+    </.admin_shell>
     """
   end
 end
