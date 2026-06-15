@@ -29,6 +29,26 @@
 
 ![Open MES Korea - 제조 데이터 수집부터 분석까지](site/assets/open-mes-factory-team.jpg)
 
+## 화면 미리보기
+
+### 생산 대시보드 — 순수 SVG 실시간 시각화
+
+작업지시 상태 도넛, 종합 불량률 게이지, 일별 생산량 스택 막대, 공정 흐름 다이어그램을 외부 차트 라이브러리 없이 SVG로 렌더(30초 자동 갱신).
+
+![생산 대시보드](docs/screenshots/dashboard.png)
+
+### 공장 생산라인 모니터 — 10공정 3축 신호등
+
+데이터 처리·장비·품질 3축을 종합한 신호등(정상/주의/이상)으로 생산라인 전체를 한눈에 본다. 라인 구성은 설정 페이지에서 편집할 수 있다.
+
+![공장 생산라인 모니터](docs/screenshots/production-line.png)
+
+### AI 종합 조사 — 시계열·미디어·생산을 Claude가 조사
+
+설비 시계열(TimescaleDB)·영상 미디어(MinIO)·생산 실적·OKF 지식 문서를 단일 컨텍스트로 종합 조사한다(Level 1 읽기 전용, 인용 근거 표시).
+
+![AI 종합 조사](docs/screenshots/ai-investigate.png)
+
 ## 왜 Open MES Korea인가
 
 제조 현장의 데이터는 작업지시, 종이 작업일보, 엑셀, 바코드, 설비와
