@@ -6,7 +6,7 @@ defmodule OpenMes.Ingest.Extension do
   기존 EXT-1 파이프라인 코드(`OpenMes.Ingest.*`)는 **일절 변경하지 않는다.**
   `enabled?/0` 는 EXT-1 의 기존 게이트 `OpenMes.Ingest.enabled?/0` 에 그대로 위임한다.
   """
-  use OpenMes.Extensions.Definition
+  use OpenMes.Extension.Definition
 
   @impl true
   def id, do: :ext_ingest
@@ -30,4 +30,18 @@ defmodule OpenMes.Ingest.Extension do
 
   @impl true
   def home_path, do: "/ingest/health"
+
+  # 라우트 데이터 선언(설계 30 §2.1) — 코어 router.ex 의 if 블록을 대체한다.
+  # EXT-1 은 다중 라우트(create + health)를 가지므로 routes 리스트로 표현한다.
+  @impl true
+  def route_spec do
+    %{
+      scope: "/ingest",
+      pipeline: [:api, :require_device_token],
+      routes: [
+        {:post, "/equipment", OpenMesWeb.IngestController, :create},
+        {:get, "/health", OpenMesWeb.IngestController, :health}
+      ]
+    }
+  end
 end

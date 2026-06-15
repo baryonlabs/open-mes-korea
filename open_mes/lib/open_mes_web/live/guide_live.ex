@@ -14,7 +14,7 @@ defmodule OpenMesWeb.GuideLive do
   # 가이드 본문 §3 의 "최소 확장 만들기" 코드 예제(pre 블록에 그대로 표시).
   @sample_extension """
   defmodule OpenMes.Addons.MyReport.Extension do
-    use OpenMes.Extensions.Definition
+    use OpenMes.Extension.Definition
 
     @impl true
     def id, do: :addon_my_report
@@ -73,11 +73,11 @@ defmodule OpenMesWeb.GuideLive do
   # mix ext.verify 체크 7종 — 가이드 §8. {코드, 검사, 방법}.
   @verify_checks [
     {"C1", "필수 6 콜백 구현", "behaviour introspection 으로 유도(하드코딩 0)"},
-    {"C2", "behaviour 채택", "@behaviour OpenMes.Extensions.Extension"},
+    {"C2", "behaviour 채택", "@behaviour OpenMes.Extension"},
     {"C3", "config :extensions 등록", "Registry.modules() 포함"},
     {"C4", "카탈로그 노출 가능", "Registry.all() 에서 raise 없이 엔트리화"},
     {"C5", "id 고유성", "등록 확장 간 id 중복 0 + atom"},
-    {"C6", "category 유효성", "Extension.categories() 기준"},
+    {"C6", "category 형태(atom)", "known_categories/0 미포함은 정보성(자유 카테고리 허용)"},
     {"C7", "코어 비침투(휴리스틱)", "확장 소스의 명백한 Repo 직접 쓰기 grep"}
   ]
 
@@ -159,7 +159,7 @@ defmodule OpenMesWeb.GuideLive do
         <section class="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <h2 class="text-lg font-semibold text-zinc-900">2. Extension SDK 레퍼런스</h2>
           <p class="mt-2 text-sm text-zinc-600">
-            <code class="rounded bg-zinc-100 px-1 text-xs">OpenMes.Extensions.Extension</code> behaviour는 메타데이터만 계약합니다.
+            <code class="rounded bg-zinc-100 px-1 text-xs">OpenMes.Extension</code> behaviour는 메타데이터만 계약합니다.
           </p>
 
           <h3 class="mt-4 text-sm font-semibold text-zinc-800">필수 콜백 6개</h3>
@@ -205,7 +205,7 @@ defmodule OpenMesWeb.GuideLive do
         <section class="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
           <h2 class="text-lg font-semibold text-zinc-900">3. 최소 확장 만들기</h2>
           <p class="mt-2 text-sm text-zinc-600">
-            <code class="rounded bg-zinc-100 px-1 text-xs">use OpenMes.Extensions.Definition</code> 한 줄로 선택 콜백 기본값이 주입됩니다. 필수 6개만 구현하면 됩니다.
+            <code class="rounded bg-zinc-100 px-1 text-xs">use OpenMes.Extension.Definition</code> 한 줄로 선택 콜백 기본값이 주입됩니다. 필수 6개만 구현하면 됩니다.
           </p>
           <pre class="mt-3 overflow-x-auto rounded-md bg-zinc-900 p-4 text-xs leading-relaxed text-zinc-100"><code>{@sample_extension}</code></pre>
         </section>

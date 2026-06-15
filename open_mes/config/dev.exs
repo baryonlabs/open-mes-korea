@@ -107,3 +107,7 @@ config :ex_aws, :s3,
 
 # ── 애드온 — 개발에서 전부 켜서 카탈로그 "열기" 링크를 모두 확인 ───────────
 config :open_mes, OpenMes.Addons.DailyProductionSummary, enabled: true
+
+# 외부 데모 확장(open_mes_ext_demo) — 기본 비활성(설계 30 증명 후 유지). 켜려면:
+#   config :open_mes_ext_demo, OpenMesExtDemo.Extension, enabled: true
+# 켜면 deps 한 줄만으로 카탈로그 카드 + /extensions/demo 라우트가 자동 노출된다(코어 수정 0).

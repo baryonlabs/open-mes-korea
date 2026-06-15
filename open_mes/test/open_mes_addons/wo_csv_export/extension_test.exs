@@ -63,7 +63,7 @@ defmodule OpenMes.Addons.WoCsvExport.ExtensionTest do
         |> Keyword.get_values(:behaviour)
         |> List.flatten()
 
-      assert OpenMes.Extensions.Extension in behaviours
+      assert OpenMes.Extension in behaviours
     end
 
     test "모든 필수/선택 콜백이 export 된다" do

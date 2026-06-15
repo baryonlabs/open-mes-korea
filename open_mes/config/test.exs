@@ -25,6 +25,13 @@ config :open_mes, OpenMesWeb.Endpoint,
 # 메타데이터를 주입).
 config :open_mes, :sql_sandbox, true
 
+# ── 확장 발견: 테스트는 :manual 로 결정적 통제 ──────────────────────────────
+# dev/prod 기본은 :auto(자동 발견)지만, ext.verify 등 일부 테스트는 :extensions 명시 목록을
+# put_env 로 바꿔 모듈 집합을 통제한다(C3/C5 결정성). :auto 면 로드된 모든 모듈을 스캔해
+# fixture 통제가 불가능하므로 테스트 전역 기본을 :manual 로 둔다. :auto 동작은
+# DiscoveryTest 가 모드를 명시적으로 :auto 로 바꿔 별도 검증한다(설계 30 §5).
+config :open_mes, :extension_discovery, :manual
+
 # ── EXT-1 설비 수집 — 테스트에서 활성화 ─────────────────────────────────────
 # 라우터의 /ingest scope 는 컴파일 타임 `OpenMes.Ingest.enabled?()` 로 등록되고,
 # Broadway 파이프라인은 application.ex 가 enabled? 기준으로 기동한다. ingest 컨트롤러/
