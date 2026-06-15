@@ -64,7 +64,9 @@ config :open_mes, :extensions, [
   OpenMes.Addons.DefectStats.Extension,
   OpenMes.Addons.LotQrLabel.Extension,
   OpenMes.Addons.EquipmentOee.Extension,
-  OpenMes.Addons.DailyProductionSummary.Extension
+  OpenMes.Addons.DailyProductionSummary.Extension,
+  # EXT-5 연동 허브 (integration)
+  OpenMes.Connect.DureClaw.Extension
 ]
 
 # ── EXT-1 설비 수집 — 기본 비활성(TimescaleDB 필요) ────────────────────────
@@ -96,6 +98,9 @@ config :open_mes, OpenMes.Addons.DefectStats, enabled: true
 config :open_mes, OpenMes.Addons.LotQrLabel, enabled: true
 config :open_mes, OpenMes.Addons.EquipmentOee, enabled: true
 config :open_mes, OpenMes.Addons.DailyProductionSummary, enabled: false
+
+# ── EXT-5 연동 허브 게이트 (DureClaw) — 버스 주소는 env BUS_URL/OAH_SECRET ──
+config :open_mes, OpenMes.Connect.DureClaw, enabled: true
 
 # AI Provider(설계 23번) — impl: nil 이면 키 존재 여부로 결정(키 없으면 MockProvider 기본).
 config :open_mes, OpenMes.Ai.Provider, impl: nil

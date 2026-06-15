@@ -38,8 +38,10 @@ defmodule OpenMes.Extensions.Extension do
     - `:quality`      — 품질
     - `:traceability` — 추적
     - `:analytics`    — 분석
+    - `:integration`  — 연동 허브(EXT-5: 이종 외부 도구/분산 에이전트 연동)
   """
-  @type category :: :ingest | :media | :production | :quality | :traceability | :analytics
+  @type category ::
+          :ingest | :media | :production | :quality | :traceability | :analytics | :integration
 
   @doc ~S'확장 고유 식별자(영문 atom, 안정적). 예: `:ext_ingest`, `:addon_wo_csv_export`.'
   @callback id() :: atom()
@@ -86,5 +88,6 @@ defmodule OpenMes.Extensions.Extension do
   검증/카탈로그/가이드가 이 함수를 단일 출처로 따라온다(pi).
   """
   @spec categories() :: [category()]
-  def categories, do: [:ingest, :media, :production, :quality, :traceability, :analytics]
+  def categories,
+    do: [:ingest, :media, :production, :quality, :traceability, :analytics, :integration]
 end
