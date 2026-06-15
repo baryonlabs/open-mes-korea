@@ -108,16 +108,17 @@ defmodule OpenMes.Connect.DureClaw do
     _ -> :error
   end
 
-  # task.result 가 StateStore 에 저장되므로 REST 로 폴링(최대 ~3초).
+  # task.result 가 StateStore 에 저장되므로 REST 로 폴링.
+  # 진짜 oah-agent(claude 실행)는 수십 초 걸리므로 최대 ~120초(500ms × 240) 대기.
   defp collect(http, headers, %{task_id: tid} = item) do
     result =
-      Enum.reduce_while(1..15, nil, fn _, _ ->
+      Enum.reduce_while(1..240, nil, fn _, _ ->
         case Req.get("#{http}/api/task-result/#{tid}",
                headers: headers,
                receive_timeout: @timeout_ms
              ) do
           {:ok, %{status: 200, body: body}} -> {:halt, body}
-          _ -> Process.sleep(200) && {:cont, nil}
+          _ -> Process.sleep(500) && {:cont, nil}
         end
       end)
 
