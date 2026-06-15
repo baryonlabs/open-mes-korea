@@ -102,6 +102,131 @@ defmodule OpenMes.Connect.DureClaw do
     end
   end
 
+  @doc """
+  불량 조사 (역할별 차등 지시 → fan-in → 종합) — RSI 루프의 1차 leg.
+
+  각 엣지에 *자기 역할*의 관측을 지시(센싱)하고, 마스터로 fan-in 수집한 뒤, 골든 시나리오면
+  결정론적 SUGGEST 로 종합한다. "센싱(엣지) → 종합(브레인) → 제안" 을 한 화면에 보인다.
+
+  반환(미스): `%{mode: :llm, pattern, work_key, lot, observations, suggest, llm_ms}`
+  반환(히트): `%{mode: :crystallized, pattern, lot, suggest, hit_us, llm_ms, frozen_at}` — LLM 0회.
+  """
+  alias OpenMes.Connect.DureClaw.SkillCache
+
+  def dispatch_investigation(lot_no) do
+    lot = String.trim(to_string(lot_no))
+    key = defect_pattern(lot)
+
+    # ── 결정화 캐시 우선 — 승인되어 동결된 룰이 있으면 LLM 디스패치 0회 ──
+    case SkillCache.lookup(key) do
+      {:hit, rule, hit_us} ->
+        %{
+          mode: :crystallized,
+          pattern: key,
+          lot: lot,
+          suggest: rule.decision,
+          hit_us: hit_us,
+          llm_ms: rule.llm_ms,
+          frozen_at: rule.frozen_at
+        }
+
+      :miss ->
+        investigate_via_llm(lot, key)
+    end
+  end
+
+  defp investigate_via_llm(lot, key) do
+    case base() do
+      {:ok, http, headers} ->
+        t0 = System.monotonic_time(:millisecond)
+        wk = (get_json(http, "/api/work-keys/latest", headers) || %{})["work_key"]
+        agents = (get_json(http, "/api/presence", headers) || %{})["agents"] || []
+
+        dispatched =
+          Enum.map(agents, fn a ->
+            name = a["name"]
+            caps = a["capabilities"] || []
+            {label, task} = role_task(caps, lot)
+
+            tid =
+              "mes-inv-#{System.system_time(:millisecond)}-#{String.replace(name, ~r/\W/, "_")}"
+
+            assign(http, headers, %{
+              "to" => name,
+              "role" => a["role"],
+              "work_key" => wk,
+              "task_id" => tid,
+              "instructions" => task
+            })
+
+            %{agent: name, role: a["role"], caps: caps, role_task: label, task_id: tid}
+          end)
+
+        observations = Enum.map(dispatched, &collect(http, headers, &1))
+
+        %{
+          mode: :llm,
+          pattern: key,
+          work_key: wk,
+          lot: lot,
+          observations: observations,
+          suggest: golden_suggest(lot),
+          llm_ms: System.monotonic_time(:millisecond) - t0
+        }
+
+      :disabled ->
+        {:error, :no_bus}
+    end
+  end
+
+  # 엣지 capability → (역할 라벨, 짧은 역할별 지시). 짧게 = 실 Claude 도 빠르게.
+  defp role_task(caps, lot) do
+    cond do
+      caps_any?(caps, ["camera", "edge", "gpio", "led"]) ->
+        {"엣지 검사", "LOT #{lot} 외관 검사: 스크래치 의심 여부와 감지 센서를 한 줄로 답해줘."}
+
+      caps_any?(caps, ["vision", "nvidia-gpu"]) ->
+        {"비전 분석", "LOT #{lot} 비전: 스크래치 점수(0~1)와 위치를 한 줄로 답해줘."}
+
+      caps_any?(caps, ["genealogy", "mes"]) ->
+        {"LOT 계보", "LOT #{lot} 계보 역추적: 공통 원자재 LOT과 영향 작업지시를 한 줄로 답해줘."}
+
+      true ->
+        {"보조 분석", "LOT #{lot} 불량 분석 보조: 핵심 한 줄."}
+    end
+  end
+
+  defp caps_any?(caps, keys), do: Enum.any?(keys, &(&1 in caps))
+
+  # 골든 시나리오 종합 (결정론적 — 무대 안정). 골든 LOT 이 아니면 nil.
+  defp golden_suggest("A-2026-1031") do
+    %{
+      "defect_type" => "외관/스크래치",
+      "root_cause" => "원자재 LOT R-882",
+      "evidence" => "동일 자재 투입 3개 작업지시 불량률 상승 + 비전 edge-top 0.88",
+      "confidence" => 0.82,
+      "affected_work_orders" => ["WO-3301", "WO-3302", "WO-3307"],
+      "action" => "quarantine"
+    }
+  end
+
+  defp golden_suggest(_), do: nil
+
+  # 불량 패턴 키 (룰 캐시 단위). 골든은 패턴 시그니처, 그 외는 lot 단위.
+  defp defect_pattern("A-2026-1031"), do: "외관/스크래치@edge-top"
+  defp defect_pattern(lot), do: "lot:#{lot}"
+
+  @doc "승인 → 결정을 룰로 동결(결정화). 다음 같은 패턴 불량은 LLM 0회로 처리된다."
+  def crystallize(lot_no, decision, opts \\ []) do
+    SkillCache.crystallize(defect_pattern(to_string(lot_no)), decision, opts)
+  end
+
+  @doc "동결된 결정론적 룰 목록(대시보드용)."
+  def frozen_rules, do: SkillCache.all()
+
+  @doc "동결 룰 해제(데모 리셋용)."
+  def forget(lot_no), do: SkillCache.forget(defect_pattern(to_string(lot_no)))
+
   defp assign(http, headers, body) do
     Req.post!("#{http}/api/task", headers: headers, json: body, receive_timeout: @timeout_ms)
   rescue

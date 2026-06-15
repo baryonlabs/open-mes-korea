@@ -38,8 +38,11 @@ defmodule OpenMesWeb.Connect.DureClawLive do
        page_title: "DureClaw 분산 오케스트레이션",
        snap: DureClaw.snapshot(),
        prompt: @default_prompt,
+       lot_no: "A-2026-1031",
        dstatus: :idle,
-       dispatch: nil
+       dispatch: nil,
+       istatus: :idle,
+       inv: nil
      )}
   end
 
@@ -54,9 +57,40 @@ defmodule OpenMesWeb.Connect.DureClawLive do
     {:noreply, assign(socket, dstatus: :dispatched, dispatch: result)}
   end
 
+  def handle_info({:inv_done, result}, socket) do
+    {:noreply, assign(socket, istatus: :done, inv: result)}
+  end
+
   @impl true
   def handle_event("refresh", _params, socket),
     do: {:noreply, assign(socket, snap: DureClaw.snapshot())}
+
+  # 불량 조사 (역할별 차등 지시 → fan-in → 종합) — RSI 1차 leg
+  def handle_event("investigate", _p, socket) do
+    pid = self()
+    lot = socket.assigns.lot_no
+    Task.start(fn -> send(pid, {:inv_done, DureClaw.dispatch_investigation(lot)}) end)
+    {:noreply, assign(socket, istatus: :running, inv: nil)}
+  end
+
+  # 승인 → 결정 동결(결정화). 다음 같은 패턴 불량은 LLM 0회.
+  def handle_event("freeze_decision", _p, socket) do
+    inv = socket.assigns.inv
+
+    if is_map(inv) and inv[:suggest] do
+      DureClaw.crystallize(inv.lot, inv.suggest, llm_ms: inv[:llm_ms], approved_by: "manager")
+    end
+
+    {:noreply, assign(socket, istatus: :frozen)}
+  end
+
+  def handle_event("forget_skill", _p, socket) do
+    DureClaw.forget(socket.assigns.lot_no)
+    {:noreply, assign(socket, istatus: :idle, inv: nil)}
+  end
+
+  def handle_event("reset_inv", _p, socket),
+    do: {:noreply, assign(socket, istatus: :idle, inv: nil)}
 
   # Approval Flow: propose → approve → execute(fan-out) → 수집
   def handle_event("propose_dispatch", %{"prompt" => prompt}, socket) do
@@ -93,6 +127,17 @@ defmodule OpenMesWeb.Connect.DureClawLive do
   end
 
   defp result_summary(_), do: "완료"
+
+  # 1회차 LLM(ms) 대비 캐시 히트(µs) 가속 배수 (콤마 포맷).
+  defp speedup(nil, _), do: "—"
+  defp speedup(_, hit_us) when not is_integer(hit_us) or hit_us <= 0, do: "—"
+
+  defp speedup(llm_ms, hit_us) do
+    (llm_ms * 1000 / hit_us)
+    |> round()
+    |> Integer.to_string()
+    |> String.replace(~r/\B(?=(\d{3})+(?!\d))/, ",")
+  end
 
   defp role_icon("executor"), do: "🤖"
   defp role_icon("builder"), do: "🏗️"
@@ -141,6 +186,130 @@ defmodule OpenMesWeb.Connect.DureClawLive do
         >
           새로고침
         </button>
+      </div>
+
+      <%!-- ★ 불량 조사 (역할별 센싱 → 종합) — 데모 클라이맥스 / RSI 1차 leg --%>
+      <div :if={@snap.connected} class="mb-6 rounded-xl border-2 border-rose-200 bg-rose-50/40 p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm font-bold text-zinc-900">🔬 불량 조사 — 역할별 센싱 → 마스터 종합</div>
+            <div class="text-xs text-zinc-500">
+              불량 LOT <span class="font-mono">{@lot_no}</span> — 각 엣지가 <em>자기 역할</em>을 센싱하고
+              마스터가 종합합니다. <span class="text-rose-500">센싱 → 추론 → 제안 → (승인=학습신호)</span>
+            </div>
+          </div>
+          <button
+            :if={@istatus == :idle}
+            phx-click="investigate"
+            class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-500"
+          >
+            불량 조사 →
+          </button>
+        </div>
+
+        <div :if={@istatus == :running} class="mt-3 animate-pulse text-sm text-zinc-500">
+          ▶ fleet 역할별 센싱 + fan-in 수집 중…
+        </div>
+
+        <div :if={@istatus in [:done, :frozen] and is_map(@inv)} class="mt-3 space-y-3">
+          <%!-- 모드 배너 --%>
+          <div
+            :if={@inv.mode == :crystallized}
+            class="rounded-lg bg-emerald-600 p-3 text-sm font-semibold text-white"
+          >
+            ⚡ 결정론적 재사용 — LLM 0회 · 캐시 히트 {@inv.hit_us}µs
+            <span :if={@inv[:llm_ms]} class="font-normal opacity-90">
+              (1회차 LLM {@inv.llm_ms}ms 대비 ~{speedup(@inv.llm_ms, @inv.hit_us)}배 · {@inv.frozen_at} 동결)
+            </span>
+          </div>
+          <div :if={@inv.mode == :llm} class="text-xs font-semibold text-zinc-600">
+            🧠 LLM 조사 (1회차, {@inv.llm_ms}ms) — Claude as compiler
+          </div>
+
+          <%!-- ① 센싱 (LLM 1회차에만; 결정화 재사용은 센싱 생략) --%>
+          <div :if={@inv.mode == :llm and @inv[:observations]}>
+            <div class="mb-1 text-xs font-semibold text-zinc-600">① 센싱 — 엣지 역할별 관측 (fan-in)</div>
+            <div class="space-y-1">
+              <div
+                :for={o <- @inv.observations}
+                class="flex items-start gap-2 rounded bg-white p-2 text-xs"
+              >
+                <span class="rounded bg-zinc-100 px-1.5 py-0.5 font-semibold text-zinc-600">
+                  {o.role_task}
+                </span>
+                <span class="font-mono text-zinc-500">{o.agent}</span>
+                <span class="text-zinc-400">→</span>
+                <span class="flex-1 text-zinc-700">{result_summary(o.result)}</span>
+              </div>
+            </div>
+          </div>
+
+          <%!-- ② 종합 SUGGEST --%>
+          <div :if={@inv[:suggest]} class="rounded-lg border border-rose-300 bg-white p-3">
+            <div class="mb-2 text-xs font-semibold text-zinc-600">
+              {if @inv.mode == :crystallized,
+                do: "동결 룰 (결정론적)",
+                else: "② 종합 — 마스터 추론 SUGGEST (제안, 판정 아님)"}
+            </div>
+            <div class="flex items-baseline justify-between">
+              <span class="text-base font-bold text-zinc-900">{@inv.suggest["defect_type"]}</span>
+              <span class="rounded bg-rose-100 px-2 py-0.5 font-mono text-xs text-rose-700">
+                신뢰도 {@inv.suggest["confidence"]}
+              </span>
+            </div>
+            <div class="mt-1 text-sm text-zinc-800">
+              원인: <span class="font-semibold">{@inv.suggest["root_cause"]}</span>
+            </div>
+            <div class="text-xs text-zinc-500">{@inv.suggest["evidence"]}</div>
+            <div class="mt-1 text-xs text-zinc-600">
+              영향:
+              <span :for={wo <- @inv.suggest["affected_work_orders"]} class="font-mono text-rose-600">
+                {wo}
+              </span>
+              · 권고 <span class="font-semibold text-rose-700">{@inv.suggest["action"]}</span>
+            </div>
+          </div>
+
+          <%!-- ③ 결정화 — 승인하면 룰로 동결 (LLM 1회차에만) --%>
+          <div
+            :if={@inv.mode == :llm and @inv[:suggest] and @istatus == :done}
+            class="rounded-lg bg-zinc-900 p-3 text-xs text-zinc-300"
+          >
+            ③ 승인 = 결정화 — 사람이 사인한 결정을 <span class="text-emerald-300">결정론적 룰로 동결</span>합니다.
+            다음 같은 패턴 불량은 <span class="text-emerald-300">LLM 0회</span>로 µs에 처리됩니다.
+            <div class="mt-2">
+              <button
+                phx-click="freeze_decision"
+                class="rounded-lg bg-emerald-500 px-3 py-1.5 font-semibold text-white hover:bg-emerald-400"
+              >
+                승인 → 결정 동결(스킬화)
+              </button>
+            </div>
+          </div>
+
+          <div :if={@istatus == :frozen} class="rounded-lg bg-emerald-50 p-3 text-xs text-emerald-800">
+            ✅ 결정 동결됨 — 같은 패턴은 이제 캐시 히트. <strong>[불량 조사 →]를 다시 누르면 LLM 0회</strong>로 µs에 응답합니다.
+            <div class="mt-2 flex gap-2">
+              <button
+                phx-click="investigate"
+                class="rounded bg-rose-600 px-3 py-1 font-semibold text-white hover:bg-rose-500"
+              >
+                다시 조사 (캐시 히트)
+              </button>
+              <button phx-click="forget_skill" class="text-zinc-500 underline hover:text-zinc-700">
+                동결 해제(리셋)
+              </button>
+            </div>
+          </div>
+
+          <button
+            :if={@istatus == :done}
+            phx-click="reset_inv"
+            class="text-xs text-zinc-500 underline hover:text-zinc-700"
+          >
+            다시
+          </button>
+        </div>
       </div>
 
       <%!-- 분석 지시 (Approval Flow: propose → approve → fan-out → 수집) --%>
