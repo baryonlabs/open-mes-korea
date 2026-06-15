@@ -19,7 +19,9 @@ defmodule OpenMesWeb.Connect.DureClawLive do
         end
       end
   """
-  use OpenMesWeb, :live_view
+  # 공통 admin 셸(사이드바·상단바·role 배지) + on_mount(current_actor/role/path 주입).
+  # 카탈로그/애드온과 동일한 OMK 레이아웃을 따른다.
+  use OpenMesWeb.Admin.AdminLive
 
   alias OpenMes.Connect.DureClaw
 
@@ -50,16 +52,22 @@ defmodule OpenMesWeb.Connect.DureClawLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-4xl px-4 py-8">
-      <header class="mb-6 flex items-start justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-zinc-900">🔌 DureClaw 분산 오케스트레이션</h1>
-          <p class="mt-1 text-sm text-zinc-500">
-            분산 에이전트 협력 버스의 fleet 을 관측합니다(읽기 전용 · 3초 라이브).
-          </p>
-        </div>
-        <.link navigate="/extensions" class="text-sm text-blue-600 hover:underline">← 확장 카탈로그</.link>
-      </header>
+    <.admin_shell
+      current_path={@current_path}
+      current_actor={@current_actor}
+      current_role={@current_role}
+      flash={@flash}
+    >
+      <.page_header
+        title="DureClaw 분산 오케스트레이션"
+        subtitle="분산 에이전트 협력 버스의 fleet 을 관측합니다(읽기 전용 · 3초 라이브)."
+      />
+
+      <div class="flex justify-end">
+        <.link navigate="/extensions" class="text-sm text-blue-600 hover:underline">
+          ← 확장 카탈로그
+        </.link>
+      </div>
 
       <%!-- 연결 상태 --%>
       <div class={[
@@ -95,10 +103,7 @@ defmodule OpenMesWeb.Connect.DureClawLive do
         연결된 에이전트 없음 — fleet(엣지 Pi·시뮬 워커)이 버스에 JOIN 하면 여기 표시됩니다.
       </div>
       <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div
-          :for={a <- @snap.agents}
-          class="rounded-lg border border-zinc-200 bg-white p-4"
-        >
+        <div :for={a <- @snap.agents} class="rounded-lg border border-zinc-200 bg-white p-4">
           <div class="flex items-center justify-between">
             <span class="font-mono font-semibold text-zinc-900">
               {role_icon(a["role"])} {a["name"]}
@@ -131,7 +136,7 @@ defmodule OpenMesWeb.Connect.DureClawLive do
           {if is_map(wk), do: wk["work_key"] || wk["key"], else: wk}
         </span>
       </div>
-    </div>
+    </.admin_shell>
     """
   end
 end
