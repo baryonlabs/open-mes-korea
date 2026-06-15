@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"커밋 메시지 형식 (Conventional Commits): docs: / feat: / fix: / refactor: / test: / chore:\"}'"
+          }
+        ]
+      }
+    ]
+  }
+}

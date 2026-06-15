@@ -1,0 +1,4 @@
+<%!-- 관리자(/admin) 레이아웃. 사이드바/상단바 골격은 각 LiveView 의 admin_shell 이 그린다.
+      여기서는 flash 만 상단 고정으로 띄운다(설계 §2.4). --%>
+<.flash_group flash={@flash} />
+{@inner_content}

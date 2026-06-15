@@ -1,0 +1,73 @@
+# docker-compose.yml — Open MES Korea 로컬 인프라
+#
+# PostgreSQL(TimescaleDB) + MinIO(S3 호환) 를 한 번에 기동한다.
+#   - db    : EXT-1(설비 수집)의 hypertable(equipment_measurements)을 위해 TimescaleDB 이미지 사용.
+#             코어/EXT-2 는 일반 PostgreSQL 기능만 쓰므로 동일 컨테이너로 충분.
+#   - minio : EXT-2(멀티미디어)의 오브젝트 스토리지(S3 호환). 콘솔 9001, API 9000.
+#   - createbuckets : 최초 1회 open-mes-media 버킷 자동 생성(mc).
+#
+# 기동:   docker compose up -d
+# 종료:   docker compose down          (볼륨 유지)
+# 초기화: docker compose down -v       (볼륨 삭제 — DB/MinIO 데이터 전부 제거)
+#
+# 접속(앱 dev.exs / runtime.exs 기본값과 일치):
+#   DB   : localhost:5432  user=postgres pass=postgres db=open_mes_dev (앱이 ecto.create 로 생성)
+#   MinIO: http://localhost:9000 (API)  http://localhost:9001 (콘솔)  minioadmin/minioadmin
+
+services:
+  db:
+    # TimescaleDB on PG16. enable_timescaledb 마이그레이션(CREATE EXTENSION timescaledb)이 동작하려면
+    # 일반 postgres 이미지가 아니라 이 이미지를 써야 한다(EXT-1 06 마이그레이션 주석 승계).
+    image: timescale/timescaledb:latest-pg16
+    container_name: open_mes_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      # 데이터베이스는 앱의 `mix ecto.create` 가 만든다(open_mes_dev / open_mes_test).
+      # 여기서 POSTGRES_DB 를 지정하지 않아 기본 postgres DB 로 접속 가능하게 둔다.
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: open_mes_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # S3 API (ex_aws 가 접속)
+      - "9001:9001"   # 웹 콘솔
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # 최초 1회 버킷 생성(open-mes-media). 멱등 — 이미 있으면 무시.
+  createbuckets:
+    image: minio/mc:latest
+    container_name: open_mes_createbuckets
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc alias set local http://minio:9000 minioadmin minioadmin) do echo '...minio 대기'; sleep 2; done;
+      /usr/bin/mc mb --ignore-existing local/open-mes-media;
+      /usr/bin/mc anonymous set none local/open-mes-media;
+      echo '버킷 준비 완료: open-mes-media';
+      exit 0;
+      "
+
+volumes:
+  pgdata:
+  minio_data:
