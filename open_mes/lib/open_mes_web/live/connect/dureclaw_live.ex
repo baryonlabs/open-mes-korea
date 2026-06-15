@@ -27,7 +27,7 @@ defmodule OpenMesWeb.Connect.DureClawLive do
 
   @poll_ms 3000
 
-  @lot_no "A-2026-1031"
+  @default_prompt "LOT A-2026-1031 외관 불량 원인을 역할별로 분석해줘 (비전 점수·LOT 계보·엣지 이미지)"
 
   @impl true
   def mount(_params, _session, socket) do
@@ -37,7 +37,7 @@ defmodule OpenMesWeb.Connect.DureClawLive do
      assign(socket,
        page_title: "DureClaw 분산 오케스트레이션",
        snap: DureClaw.snapshot(),
-       lot_no: @lot_no,
+       prompt: @default_prompt,
        dstatus: :idle,
        dispatch: nil
      )}
@@ -59,15 +59,20 @@ defmodule OpenMesWeb.Connect.DureClawLive do
     do: {:noreply, assign(socket, snap: DureClaw.snapshot())}
 
   # Approval Flow: propose → approve → execute(fan-out) → 수집
-  def handle_event("propose_dispatch", _p, socket),
-    do: {:noreply, assign(socket, dstatus: :proposed)}
+  def handle_event("propose_dispatch", %{"prompt" => prompt}, socket) do
+    if String.trim(prompt) == "" do
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, prompt: prompt, dstatus: :proposed)}
+    end
+  end
 
   def handle_event("cancel_dispatch", _p, socket), do: {:noreply, assign(socket, dstatus: :idle)}
 
   def handle_event("approve_dispatch", _p, socket) do
     pid = self()
-    lot = socket.assigns.lot_no
-    Task.start(fn -> send(pid, {:dispatch_done, DureClaw.dispatch_analysis(lot)}) end)
+    prompt = socket.assigns.prompt
+    Task.start(fn -> send(pid, {:dispatch_done, DureClaw.dispatch_analysis(prompt)}) end)
     {:noreply, assign(socket, dstatus: :dispatching)}
   end
 
@@ -140,35 +145,40 @@ defmodule OpenMesWeb.Connect.DureClawLive do
 
       <%!-- 분석 지시 (Approval Flow: propose → approve → fan-out → 수집) --%>
       <div :if={@snap.connected} class="mb-6 rounded-lg border border-indigo-200 bg-indigo-50/40 p-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-sm font-semibold text-zinc-800">분석 지시 — fleet fan-out</div>
-            <div class="text-xs text-zinc-500">
-              LOT <span class="font-mono">{@lot_no}</span>
-              분석을 온라인 {length(@snap.agents)}개 에이전트에 동시 지시합니다.
-            </div>
-          </div>
-          <button
-            :if={@dstatus == :idle}
-            phx-click="propose_dispatch"
-            disabled={@snap.agents == []}
-            class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40"
-          >
-            분석 지시 →
-          </button>
+        <div class="text-sm font-semibold text-zinc-800">분석 지시 — fleet fan-out</div>
+        <div class="text-xs text-zinc-500">
+          자유 프롬프트를 온라인 {length(@snap.agents)}개 에이전트에 동시 지시합니다(승인 후 실행).
         </div>
+
+        <%!-- 프롬프트 입력 (idle) --%>
+        <form :if={@dstatus == :idle} phx-submit="propose_dispatch" class="mt-3">
+          <textarea
+            name="prompt"
+            rows="2"
+            placeholder="에이전트에 보낼 지시를 자유롭게 입력…"
+            class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+          >{@prompt}</textarea>
+          <div class="mt-2 flex justify-end">
+            <button
+              type="submit"
+              disabled={@snap.agents == []}
+              class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40"
+            >
+              분석 지시 →
+            </button>
+          </div>
+        </form>
 
         <%!-- propose --%>
         <div :if={@dstatus == :proposed} class="mt-3 rounded-md border border-indigo-200 bg-white p-3">
           <p class="text-sm text-zinc-700">
             <span class="font-semibold">제안(propose)</span>
-            — 아래 액션을 실행할까요? AI/사람 지시는 <span class="font-semibold">승인 후 실행</span>됩니다(직접 실행 X).
+            — 이 프롬프트를 실행할까요? 지시는 <span class="font-semibold">승인 후 실행</span>됩니다(직접 실행 X).
           </p>
-          <ul class="mt-2 list-disc pl-5 text-xs text-zinc-500">
-            <li :for={a <- @snap.agents}>
-              {a["name"]} ← task.assign "LOT {@lot_no} 분석"
-            </li>
-          </ul>
+          <pre class="mt-2 whitespace-pre-wrap rounded bg-zinc-50 p-2 text-xs text-zinc-700">{@prompt}</pre>
+          <div class="mt-1 text-xs text-zinc-500">
+            대상: <span :for={a <- @snap.agents} class="font-mono">{a["name"]}</span>
+          </div>
           <div class="mt-3 flex gap-2">
             <button
               phx-click="approve_dispatch"
@@ -190,9 +200,18 @@ defmodule OpenMesWeb.Connect.DureClawLive do
           ▶ fan-out 지시 전송 + 결과 수집(fan-in) 중…
         </div>
 
+        <%!-- 에러 --%>
+        <div
+          :if={@dstatus == :dispatched and not is_map(@dispatch)}
+          class="mt-3 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700"
+        >
+          지시 실패: {inspect(@dispatch)}
+          <button phx-click="cancel_dispatch" class="ml-2 underline">다시</button>
+        </div>
+
         <%!-- dispatched: fan-in 결과 --%>
         <div
-          :if={@dstatus == :dispatched and @dispatch}
+          :if={@dstatus == :dispatched and is_map(@dispatch)}
           class="mt-3 rounded-md border border-emerald-200 bg-white p-3"
         >
           <div class="mb-2 text-sm font-semibold text-zinc-800">

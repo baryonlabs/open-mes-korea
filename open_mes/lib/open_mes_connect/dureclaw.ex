@@ -62,9 +62,11 @@ defmodule OpenMes.Connect.DureClaw do
 
   반환: `%{work_key, dispatched: [%{agent, role, caps, task_id, result}]}` | `{:error, :no_bus}`.
   """
-  def dispatch_analysis(lot_no) do
+  def dispatch_analysis(prompt) do
+    instructions = String.trim(to_string(prompt))
+
     case base() do
-      {:ok, http, headers} ->
+      {:ok, http, headers} when instructions != "" ->
         wk = (get_json(http, "/api/work-keys/latest", headers) || %{})["work_key"]
         agents = (get_json(http, "/api/presence", headers) || %{})["agents"] || []
 
@@ -73,19 +75,27 @@ defmodule OpenMes.Connect.DureClaw do
             name = a["name"]
             tid = "mes-#{System.system_time(:millisecond)}-#{String.replace(name, ~r/\W/, "_")}"
 
+            # 자유 프롬프트가 그대로 instructions 로 전달된다. 진짜 oah-agent(claude/codex/…)는
+            # 이를 읽어 실행하고, sim 워커는 무시하고 ack 한다.
             assign(http, headers, %{
               "to" => name,
               "role" => a["role"],
               "work_key" => wk,
               "task_id" => tid,
-              "instructions" =>
-                "LOT #{lot_no} 분석 — #{a["role"]} 역할 수집(#{Enum.join(a["capabilities"] || [], "/")})"
+              "instructions" => instructions
             })
 
             %{agent: name, role: a["role"], caps: a["capabilities"] || [], task_id: tid}
           end)
 
-        %{work_key: wk, dispatched: Enum.map(dispatched, &collect(http, headers, &1))}
+        %{
+          work_key: wk,
+          prompt: instructions,
+          dispatched: Enum.map(dispatched, &collect(http, headers, &1))
+        }
+
+      {:ok, _http, _headers} ->
+        {:error, :empty_prompt}
 
       :disabled ->
         {:error, :no_bus}
