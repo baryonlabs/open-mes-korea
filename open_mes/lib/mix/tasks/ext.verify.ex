@@ -37,11 +37,14 @@ defmodule Mix.Tasks.Ext.Verify do
   alias OpenMes.Extensions.{Extension, Registry}
 
   # C7 코어 직접 쓰기 위반 패턴(설계 §3.3). 단순 export/읽기 애드온은 0건이어야 한다.
-  @write_patterns [
-    ~r/Repo\.(insert|update|delete|insert_all|update_all|delete_all)\b/,
-    ~r/Ecto\.Multi\b/,
-    ~r/OpenMes\.Repo\./
-  ]
+  # 함수로 둔다(모듈 속성 X) — Elixir 1.18부터 컴파일된 ~r// 는 모듈 속성에 못 넣는다(Reference).
+  defp write_patterns do
+    [
+      ~r/Repo\.(insert|update|delete|insert_all|update_all|delete_all)\b/,
+      ~r/Ecto\.Multi\b/,
+      ~r/OpenMes\.Repo\./
+    ]
+  end
 
   @impl Mix.Task
   def run(args) do
@@ -169,8 +172,7 @@ defmodule Mix.Tasks.Ext.Verify do
     if Enum.any?(Registry.all(), &(&1.module == mod)) do
       {:ok, "C4", "카탈로그 노출 가능"}
     else
-      {:fail, "C4", "카탈로그 노출 불가(콜백 raise 또는 미등록)",
-       "id/name/category 등 콜백 반환값 점검 (또는 C3 먼저 해결)"}
+      {:fail, "C4", "카탈로그 노출 불가(콜백 raise 또는 미등록)", "id/name/category 등 콜백 반환값 점검 (또는 C3 먼저 해결)"}
     end
   rescue
     e ->
@@ -184,8 +186,7 @@ defmodule Mix.Tasks.Ext.Verify do
 
     cond do
       not is_atom(id) or is_nil(id) ->
-        {:fail, "C5", "id 가 atom 이 아님(#{inspect(id)})",
-         "id/0 이 :addon_* 형태 atom 을 반환하도록 변경"}
+        {:fail, "C5", "id 가 atom 이 아님(#{inspect(id)})", "id/0 이 :addon_* 형태 atom 을 반환하도록 변경"}
 
       true ->
         freq =
@@ -245,7 +246,7 @@ defmodule Mix.Tasks.Ext.Verify do
     |> String.split("\n")
     |> Enum.with_index(1)
     |> Enum.flat_map(fn {line, n} ->
-      if Enum.any?(@write_patterns, &Regex.match?(&1, line)) do
+      if Enum.any?(write_patterns(), &Regex.match?(&1, line)) do
         [{path, n, String.trim(line)}]
       else
         []
@@ -257,6 +258,7 @@ defmodule Mix.Tasks.Ext.Verify do
   # 예: OpenMes.Addons.WoCsvExport.Extension → open_mes_addons/wo_csv_export/
   defp addon_source_files(mod) do
     base = Macro.underscore(mod)
+
     # ".../extension" 의 마지막 한 단계(extension)를 떼어 디렉토리 루트를 얻는다.
     dir = Path.dirname(base)
     name = Path.basename(dir)

@@ -237,6 +237,15 @@ defmodule OpenMesWeb.Router do
     end
   end
 
+  # ── EXT-5 연동 허브: DureClaw 분산 오케스트레이션 ────────────────────────
+  if OpenMes.Connect.DureClaw.Extension.enabled?() do
+    scope "/extensions", OpenMesWeb.Connect do
+      pipe_through :browser
+
+      live "/dureclaw", DureClawLive, :index
+    end
+  end
+
   # ── 애드온 ③ LOT QR 라벨 생성 ──────────────────────────────────────────
   if OpenMes.Addons.LotQrLabel.Extension.enabled?() do
     scope "/extensions", OpenMesWeb.Addons do
