@@ -27,10 +27,20 @@ defmodule OpenMesWeb.Connect.DureClawLive do
 
   @poll_ms 3000
 
+  @lot_no "A-2026-1031"
+
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket), do: Process.send_after(self(), :poll, @poll_ms)
-    {:ok, assign(socket, page_title: "DureClaw 분산 오케스트레이션", snap: DureClaw.snapshot())}
+
+    {:ok,
+     assign(socket,
+       page_title: "DureClaw 분산 오케스트레이션",
+       snap: DureClaw.snapshot(),
+       lot_no: @lot_no,
+       dstatus: :idle,
+       dispatch: nil
+     )}
   end
 
   @impl true
@@ -39,9 +49,45 @@ defmodule OpenMesWeb.Connect.DureClawLive do
     {:noreply, assign(socket, snap: DureClaw.snapshot())}
   end
 
+  # 비동기 fan-out/fan-in 완료
+  def handle_info({:dispatch_done, result}, socket) do
+    {:noreply, assign(socket, dstatus: :dispatched, dispatch: result)}
+  end
+
   @impl true
   def handle_event("refresh", _params, socket),
     do: {:noreply, assign(socket, snap: DureClaw.snapshot())}
+
+  # Approval Flow: propose → approve → execute(fan-out) → 수집
+  def handle_event("propose_dispatch", _p, socket),
+    do: {:noreply, assign(socket, dstatus: :proposed)}
+
+  def handle_event("cancel_dispatch", _p, socket), do: {:noreply, assign(socket, dstatus: :idle)}
+
+  def handle_event("approve_dispatch", _p, socket) do
+    pid = self()
+    lot = socket.assigns.lot_no
+    Task.start(fn -> send(pid, {:dispatch_done, DureClaw.dispatch_analysis(lot)}) end)
+    {:noreply, assign(socket, dstatus: :dispatching)}
+  end
+
+  # task.result 본문에서 사람이 읽을 요약 추출 (sim=ack, 실에이전트=emits/summary).
+  defp result_summary(nil), do: "(응답 없음 — 타임아웃)"
+
+  defp result_summary(%{} = r) do
+    rich =
+      r
+      |> Map.drop(["task_id", "from", "event", "ts", "to", "status", "summary", "latency_ms"])
+      |> Enum.map(fn {k, v} -> "#{k}=#{inspect(v)}" end)
+
+    cond do
+      rich != [] -> Enum.join(rich, " · ")
+      r["summary"] -> r["summary"]
+      true -> "완료"
+    end
+  end
+
+  defp result_summary(_), do: "완료"
 
   defp role_icon("executor"), do: "🤖"
   defp role_icon("builder"), do: "🏗️"
@@ -90,6 +136,88 @@ defmodule OpenMesWeb.Connect.DureClawLive do
         >
           새로고침
         </button>
+      </div>
+
+      <%!-- 분석 지시 (Approval Flow: propose → approve → fan-out → 수집) --%>
+      <div :if={@snap.connected} class="mb-6 rounded-lg border border-indigo-200 bg-indigo-50/40 p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm font-semibold text-zinc-800">분석 지시 — fleet fan-out</div>
+            <div class="text-xs text-zinc-500">
+              LOT <span class="font-mono">{@lot_no}</span>
+              분석을 온라인 {length(@snap.agents)}개 에이전트에 동시 지시합니다.
+            </div>
+          </div>
+          <button
+            :if={@dstatus == :idle}
+            phx-click="propose_dispatch"
+            disabled={@snap.agents == []}
+            class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40"
+          >
+            분석 지시 →
+          </button>
+        </div>
+
+        <%!-- propose --%>
+        <div :if={@dstatus == :proposed} class="mt-3 rounded-md border border-indigo-200 bg-white p-3">
+          <p class="text-sm text-zinc-700">
+            <span class="font-semibold">제안(propose)</span>
+            — 아래 액션을 실행할까요? AI/사람 지시는 <span class="font-semibold">승인 후 실행</span>됩니다(직접 실행 X).
+          </p>
+          <ul class="mt-2 list-disc pl-5 text-xs text-zinc-500">
+            <li :for={a <- @snap.agents}>
+              {a["name"]} ← task.assign "LOT {@lot_no} 분석"
+            </li>
+          </ul>
+          <div class="mt-3 flex gap-2">
+            <button
+              phx-click="approve_dispatch"
+              class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
+            >
+              승인 → 지시 실행
+            </button>
+            <button
+              phx-click="cancel_dispatch"
+              class="rounded-lg border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+
+        <%!-- dispatching --%>
+        <div :if={@dstatus == :dispatching} class="mt-3 animate-pulse text-sm text-zinc-500">
+          ▶ fan-out 지시 전송 + 결과 수집(fan-in) 중…
+        </div>
+
+        <%!-- dispatched: fan-in 결과 --%>
+        <div
+          :if={@dstatus == :dispatched and @dispatch}
+          class="mt-3 rounded-md border border-emerald-200 bg-white p-3"
+        >
+          <div class="mb-2 text-sm font-semibold text-zinc-800">
+            ✅ 지시 완료 · fan-in 수집 (work_key <span class="font-mono text-xs">{@dispatch.work_key}</span>)
+          </div>
+          <div class="space-y-1">
+            <div :for={d <- @dispatch.dispatched} class="flex items-start gap-2 text-xs">
+              <span class="font-mono font-semibold text-zinc-700">{role_icon(d.role)} {d.agent}</span>
+              <span class="text-zinc-400">→</span>
+              <span class="text-zinc-600">
+                {result_summary(d.result)}
+              </span>
+            </div>
+          </div>
+          <p class="mt-2 text-[11px] text-zinc-400">
+            sim 에이전트는 ack 응답만 반환합니다. 실제 데이터(비전 점수·LOT 계보)는 물리 에이전트(Pi·GPU)가
+            실작업하거나 시나리오 emits 주입 시 수집됩니다.
+          </p>
+          <button
+            phx-click="cancel_dispatch"
+            class="mt-2 text-xs text-zinc-500 underline hover:text-zinc-700"
+          >
+            다시
+          </button>
+        </div>
       </div>
 
       <%!-- 온라인 에이전트 --%>

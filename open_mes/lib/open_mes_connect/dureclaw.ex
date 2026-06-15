@@ -52,6 +52,70 @@ defmodule OpenMes.Connect.DureClaw do
     end
   end
 
+  @doc """
+  분석 지시(Approval Flow `:executed`) — 온라인 에이전트에 task.assign fan-out 후
+  결과를 fan-in 수집한다. REST 전용(버스 `POST /api/task` + `GET /api/task-result/:id`).
+
+  코어 OMK 도메인 쓰기 0 — 외부 버스로의 지시·수집일 뿐(코어 비침투).
+  주의: sim 에이전트는 ack("{role} completed")만 반환한다. rich 데이터(비전 점수·LOT 계보)는
+  물리 에이전트(Pi 카메라·GPU)가 실작업하거나 시나리오가 emits 를 주입할 때 나온다.
+
+  반환: `%{work_key, dispatched: [%{agent, role, caps, task_id, result}]}` | `{:error, :no_bus}`.
+  """
+  def dispatch_analysis(lot_no) do
+    case base() do
+      {:ok, http, headers} ->
+        wk = (get_json(http, "/api/work-keys/latest", headers) || %{})["work_key"]
+        agents = (get_json(http, "/api/presence", headers) || %{})["agents"] || []
+
+        dispatched =
+          Enum.map(agents, fn a ->
+            name = a["name"]
+            tid = "mes-#{System.system_time(:millisecond)}-#{String.replace(name, ~r/\W/, "_")}"
+
+            assign(http, headers, %{
+              "to" => name,
+              "role" => a["role"],
+              "work_key" => wk,
+              "task_id" => tid,
+              "instructions" =>
+                "LOT #{lot_no} 분석 — #{a["role"]} 역할 수집(#{Enum.join(a["capabilities"] || [], "/")})"
+            })
+
+            %{agent: name, role: a["role"], caps: a["capabilities"] || [], task_id: tid}
+          end)
+
+        %{work_key: wk, dispatched: Enum.map(dispatched, &collect(http, headers, &1))}
+
+      :disabled ->
+        {:error, :no_bus}
+    end
+  end
+
+  defp assign(http, headers, body) do
+    Req.post!("#{http}/api/task", headers: headers, json: body, receive_timeout: @timeout_ms)
+  rescue
+    _ -> :error
+  end
+
+  # task.result 가 StateStore 에 저장되므로 REST 로 폴링(최대 ~3초).
+  defp collect(http, headers, %{task_id: tid} = item) do
+    result =
+      Enum.reduce_while(1..15, nil, fn _, _ ->
+        case Req.get("#{http}/api/task-result/#{tid}",
+               headers: headers,
+               receive_timeout: @timeout_ms
+             ) do
+          {:ok, %{status: 200, body: body}} -> {:halt, body}
+          _ -> Process.sleep(200) && {:cont, nil}
+        end
+      end)
+
+    Map.put(item, :result, result)
+  rescue
+    _ -> Map.put(item, :result, nil)
+  end
+
   defp base do
     case System.get_env("BUS_URL") do
       url when is_binary(url) and url != "" ->
