@@ -9,7 +9,7 @@ defmodule OpenMes.Media.Extension do
   EXT-2 는 자체 HTML 화면이 없으므로(NAS 폴링 → object storage 이관 백그라운드 파이프라인)
   `home_path/0` 는 기본값 nil 을 유지한다 → 카탈로그에서 "열기" 링크 없이 카드만 노출된다.
   """
-  use OpenMes.Extensions.Definition
+  use OpenMes.Extension.Definition
 
   @impl true
   def id, do: :ext_media

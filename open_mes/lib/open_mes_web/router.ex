@@ -16,6 +16,7 @@ defmodule OpenMesWeb.Router do
   비침투: 코어 `/api` scope 는 확장 enabled 여부와 무관하게 항상 등록된다.
   """
   use OpenMesWeb, :router
+  require OpenMes.Extension.RouterMount
 
   # ── 파이프라인 ─────────────────────────────────────────────────────────
   pipeline :browser do
@@ -206,72 +207,13 @@ defmodule OpenMesWeb.Router do
     post "/work_orders/:id/cancel", WorkOrderController, :cancel
   end
 
-  # ── EXT-1 설비 수집 (06) — 활성 시에만 등록 ────────────────────────────
-  if OpenMes.Ingest.enabled?() do
-    scope "/ingest", OpenMesWeb do
-      pipe_through [:api, :require_device_token]
-
-      post "/equipment", IngestController, :create
-      get "/health", IngestController, :health
-    end
-  end
-
-  # ── EXT-2 멀티미디어 (07) — MVP 는 백그라운드 파이프라인 위주라 HTTP 라우트 없음.
-
-  # ── 애드온 ① 작업지시 CSV 내보내기 ─────────────────────────────────────
-  if OpenMes.Addons.WoCsvExport.Extension.enabled?() do
-    scope "/extensions", OpenMesWeb.Addons do
-      pipe_through :browser
-
-      live "/wo-csv-export", WoCsvExportLive, :index
-      get "/wo-csv-export/download", WoCsvExportController, :download
-    end
-  end
-
-  # ── 애드온 ② 불량 통계 위젯 ────────────────────────────────────────────
-  if OpenMes.Addons.DefectStats.Extension.enabled?() do
-    scope "/extensions", OpenMesWeb.Addons do
-      pipe_through :browser
-
-      live "/defect-stats", DefectStatsLive, :index
-    end
-  end
-
-  # ── EXT-5 연동 허브: DureClaw 분산 오케스트레이션 ────────────────────────
-  if OpenMes.Connect.DureClaw.Extension.enabled?() do
-    scope "/extensions", OpenMesWeb.Connect do
-      pipe_through :browser
-
-      live "/dureclaw", DureClawLive, :index
-    end
-  end
-
-  # ── 애드온 ③ LOT QR 라벨 생성 ──────────────────────────────────────────
-  if OpenMes.Addons.LotQrLabel.Extension.enabled?() do
-    scope "/extensions", OpenMesWeb.Addons do
-      pipe_through :browser
-
-      live "/lot-qr-label", LotQrLabelLive, :index
-    end
-  end
-
-  # ── 애드온 ④ 설비 가동률 OEE ───────────────────────────────────────────
-  if OpenMes.Addons.EquipmentOee.Extension.enabled?() do
-    scope "/extensions", OpenMesWeb.Addons do
-      pipe_through :browser
-
-      live "/equipment-oee", EquipmentOeeLive, :index
-    end
-  end
-
-  # ── 애드온 ⑤ 일일 생산 요약 ────────────────────────────────────────────
-  if OpenMes.Addons.DailyProductionSummary.Extension.enabled?() do
-    scope "/extensions", OpenMesWeb.Addons do
-      pipe_through :browser
-
-      live "/daily-production-summary", DailyProductionSummaryLive, :index
-    end
-  end
+  # ── 확장 라우트 일괄 주입 (설계 30 §2.1) ───────────────────────────────
+  # 하드코딩 if 블록 7개(EXT-1 + 애드온 5 + DureClaw)를 이 한 줄로 대체한다.
+  # 각 확장이 `route_spec/0`(순수 데이터)으로 자기 라우트를 선언하고, 매크로가
+  # 컴파일 타임에 `enabled? == true` 인 확장만 순회해 주입한다(off 면 라우트 흔적 0).
+  # 외부 repo 확장은 deps 한 줄만 추가하면 코어 router.ex 수정 없이 자동 노출된다.
+  # EXT-2(멀티미디어)는 route_spec/0 미구현(nil) → 라우트 0(백그라운드 파이프라인).
+  OpenMes.Extension.RouterMount.mount_extension_routes()
 
   # ── phx.new dev_routes (LiveDashboard) — 개발 환경 보존 ─────────────────
   if Application.compile_env(:open_mes, :dev_routes) do

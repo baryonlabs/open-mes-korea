@@ -74,7 +74,7 @@ defmodule OpenMes.Addons.DailyProductionSummary.ExtensionTest do
         |> Keyword.get_values(:behaviour)
         |> List.flatten()
 
-      assert OpenMes.Extensions.Extension in behaviours
+      assert OpenMes.Extension in behaviours
     end
 
     test "Extension.enabled?/0 는 퍼사드 게이트에 위임한다" do

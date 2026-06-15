@@ -2,13 +2,13 @@ defmodule OpenMes.Connect.DureClaw.Extension do
   @moduledoc """
   EXT-5 연동 허브 — DureClaw 의 카탈로그 메타데이터 모듈.
 
-  `OpenMes.Extensions.Extension` behaviour 를 구현한다(설계 §1.1 계약).
+  `OpenMes.Extension` behaviour 를 구현한다(설계 §1.1 계약).
   필수 6개(id/name/description/category/version/enabled?) + 화면이 있으므로 `home_path/0` override.
   `enabled?/0` 는 퍼사드 게이트(`OpenMes.Connect.DureClaw.enabled?/0`)에 위임한다.
 
   이 모듈은 **메타데이터만** 노출한다. 버스 조회/화면은 알지 않는다(레지스트리는 동작을 모름 — pi).
   """
-  use OpenMes.Extensions.Definition
+  use OpenMes.Extension.Definition
 
   @impl true
   def id, do: :connect_dureclaw
@@ -32,4 +32,14 @@ defmodule OpenMes.Connect.DureClaw.Extension do
 
   @impl true
   def home_path, do: "/extensions/dureclaw"
+
+  # 라우트 데이터 선언(설계 30 §2.1) — live 1.
+  @impl true
+  def route_spec do
+    %{
+      scope: "/extensions",
+      pipeline: :browser,
+      routes: [{:live, "/dureclaw", OpenMesWeb.Connect.DureClawLive, :index}]
+    }
+  end
 end

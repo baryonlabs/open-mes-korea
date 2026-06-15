@@ -2,14 +2,14 @@ defmodule OpenMes.Addons.WoCsvExport.Extension do
   @moduledoc """
   작업지시 CSV 내보내기 애드온의 `Extension` behaviour 구현(메타데이터).
 
-  레지스트리(`OpenMes.Extensions.Registry`)가 이 모듈의 콜백으로 카탈로그 카드를 그린다.
+  레지스트리(`OpenMes.Extension.Registry`)가 이 모듈의 콜백으로 카탈로그 카드를 그린다.
   실제 CSV 로직은 `OpenMes.Addons.WoCsvExport`(퍼사드) / `.Csv`(직렬화) 가 담당하며,
   이 모듈은 메타데이터 + 활성 게이트만 노출한다(설계 §1.1 — behaviour 는 메타데이터만 계약).
 
-  `use OpenMes.Extensions.Definition` 가 선택 콜백(`icon/0`)의 기본값(nil)을 주입하므로,
+  `use OpenMes.Extension.Definition` 가 선택 콜백(`icon/0`)의 기본값(nil)을 주입하므로,
   필수 6개(id/name/description/category/version/enabled?) + 화면 경로(home_path/0)만 구현한다.
   """
-  use OpenMes.Extensions.Definition
+  use OpenMes.Extension.Definition
 
   @impl true
   def id, do: :addon_wo_csv_export
@@ -32,4 +32,17 @@ defmodule OpenMes.Addons.WoCsvExport.Extension do
   # 자체 화면(필터 선택 + 다운로드)을 가지므로 home_path 를 override 한다.
   @impl true
   def home_path, do: "/extensions/wo-csv-export"
+
+  # 라우트 데이터 선언(설계 30 §2.1) — live 1 + get(다운로드) 1.
+  @impl true
+  def route_spec do
+    %{
+      scope: "/extensions",
+      pipeline: :browser,
+      routes: [
+        {:live, "/wo-csv-export", OpenMesWeb.Addons.WoCsvExportLive, :index},
+        {:get, "/wo-csv-export/download", OpenMesWeb.Addons.WoCsvExportController, :download}
+      ]
+    }
+  end
 end
