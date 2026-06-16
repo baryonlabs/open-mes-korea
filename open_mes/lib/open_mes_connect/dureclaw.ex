@@ -18,6 +18,11 @@ defmodule OpenMes.Connect.DureClaw do
   """
 
   @timeout_ms 1500
+  # 결과 폴링: fan-in 은 병렬(collect_all)이라 전체 대기 = 가장 느린 1개(합산 아님).
+  # observer·원격 노드는 task.result 를 안 올리므로 *항상* 상한에 걸린다 → 상한 = 무대 대기시간.
+  # 데모 안전: 15s(30×500ms) 상한. SUGGEST 는 결정론적(golden)이라 응답 없어도 항상 종합된다.
+  @poll_max 30
+  @poll_int 500
 
   @doc """
   확장 활성 여부. config 게이트.
@@ -91,7 +96,7 @@ defmodule OpenMes.Connect.DureClaw do
         %{
           work_key: wk,
           prompt: instructions,
-          dispatched: Enum.map(dispatched, &collect(http, headers, &1))
+          dispatched: collect_all(http, headers, dispatched)
         }
 
       {:ok, _http, _headers} ->
@@ -162,7 +167,7 @@ defmodule OpenMes.Connect.DureClaw do
             %{agent: name, role: a["role"], caps: caps, role_task: label, task_id: tid}
           end)
 
-        observations = Enum.map(dispatched, &collect(http, headers, &1))
+        observations = collect_all(http, headers, dispatched)
 
         %{
           mode: :llm,
@@ -233,17 +238,33 @@ defmodule OpenMes.Connect.DureClaw do
     _ -> :error
   end
 
-  # task.result 가 StateStore 에 저장되므로 REST 로 폴링.
-  # 진짜 oah-agent(claude 실행)는 수십 초 걸리므로 최대 ~120초(500ms × 240) 대기.
+  # fan-in 을 병렬로 — 전체 대기 = 가장 느린 1개(합산 아님). 죽은 에이전트(observer·원격)는
+  # @poll_max 상한에서 nil 로 떨어지고 나머지를 막지 않는다. 타임아웃 태스크는 kill → nil.
+  defp collect_all(http, headers, dispatched) do
+    dispatched
+    |> Task.async_stream(
+      &collect(http, headers, &1),
+      max_concurrency: max(length(dispatched), 1),
+      timeout: @poll_max * @poll_int + 5_000,
+      on_timeout: :kill_task
+    )
+    |> Enum.zip(dispatched)
+    |> Enum.map(fn
+      {{:ok, collected}, _item} -> collected
+      {{:exit, _}, item} -> Map.put(item, :result, nil)
+    end)
+  end
+
+  # task.result 가 StateStore 에 저장되므로 REST 로 폴링. 단일 에이전트 상한 @poll_max×@poll_int.
   defp collect(http, headers, %{task_id: tid} = item) do
     result =
-      Enum.reduce_while(1..240, nil, fn _, _ ->
+      Enum.reduce_while(1..@poll_max, nil, fn _, _ ->
         case Req.get("#{http}/api/task-result/#{tid}",
                headers: headers,
                receive_timeout: @timeout_ms
              ) do
           {:ok, %{status: 200, body: body}} -> {:halt, body}
-          _ -> Process.sleep(500) && {:cont, nil}
+          _ -> Process.sleep(@poll_int) && {:cont, nil}
         end
       end)
 

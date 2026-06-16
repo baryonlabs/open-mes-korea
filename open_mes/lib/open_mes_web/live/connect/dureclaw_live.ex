@@ -272,7 +272,7 @@ defmodule OpenMesWeb.Connect.DureClawLive do
 
           <%!-- ③ 결정화 — 승인하면 룰로 동결 (LLM 1회차에만) --%>
           <div
-            :if={@inv.mode == :llm and @inv[:suggest] and @istatus == :done}
+            :if={@inv.mode == :llm && @inv[:suggest] && @istatus == :done}
             class="rounded-lg bg-zinc-900 p-3 text-xs text-zinc-300"
           >
             ③ 승인 = 결정화 — 사람이 사인한 결정을 <span class="text-emerald-300">결정론적 룰로 동결</span>합니다.
