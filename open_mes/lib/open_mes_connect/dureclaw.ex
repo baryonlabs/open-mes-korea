@@ -229,6 +229,12 @@ defmodule OpenMes.Connect.DureClaw do
   @doc "동결된 결정론적 룰 목록(대시보드용)."
   def frozen_rules, do: SkillCache.all()
 
+  @doc """
+  결정화 누적 통계(대시보드용) — RSI 학습 루프의 "이야기" 를 수치로.
+  `%{rule_count, total_hits, saved_ms, avg_hit_us, rules}`. 상세: `SkillCache.stats/0`.
+  """
+  def crystallization_stats, do: SkillCache.stats()
+
   @doc "동결 룰 해제(데모 리셋용)."
   def forget(lot_no), do: SkillCache.forget(defect_pattern(to_string(lot_no)))
 

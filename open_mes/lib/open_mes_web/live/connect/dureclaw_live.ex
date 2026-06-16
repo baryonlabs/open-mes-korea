@@ -42,14 +42,15 @@ defmodule OpenMesWeb.Connect.DureClawLive do
        dstatus: :idle,
        dispatch: nil,
        istatus: :idle,
-       inv: nil
+       inv: nil,
+       cryst: DureClaw.crystallization_stats()
      )}
   end
 
   @impl true
   def handle_info(:poll, socket) do
     Process.send_after(self(), :poll, @poll_ms)
-    {:noreply, assign(socket, snap: DureClaw.snapshot())}
+    {:noreply, assign(socket, snap: DureClaw.snapshot(), cryst: DureClaw.crystallization_stats())}
   end
 
   # 비동기 fan-out/fan-in 완료
@@ -58,7 +59,9 @@ defmodule OpenMesWeb.Connect.DureClawLive do
   end
 
   def handle_info({:inv_done, result}, socket) do
-    {:noreply, assign(socket, istatus: :done, inv: result)}
+    # 결정화 재사용(캐시 히트)은 hits 를 증가시키므로 대시보드도 갱신.
+    {:noreply,
+     assign(socket, istatus: :done, inv: result, cryst: DureClaw.crystallization_stats())}
   end
 
   @impl true
@@ -81,12 +84,12 @@ defmodule OpenMesWeb.Connect.DureClawLive do
       DureClaw.crystallize(inv.lot, inv.suggest, llm_ms: inv[:llm_ms], approved_by: "manager")
     end
 
-    {:noreply, assign(socket, istatus: :frozen)}
+    {:noreply, assign(socket, istatus: :frozen, cryst: DureClaw.crystallization_stats())}
   end
 
   def handle_event("forget_skill", _p, socket) do
     DureClaw.forget(socket.assigns.lot_no)
-    {:noreply, assign(socket, istatus: :idle, inv: nil)}
+    {:noreply, assign(socket, istatus: :idle, inv: nil, cryst: DureClaw.crystallization_stats())}
   end
 
   def handle_event("reset_inv", _p, socket),
@@ -138,6 +141,18 @@ defmodule OpenMesWeb.Connect.DureClawLive do
     |> Integer.to_string()
     |> String.replace(~r/\B(?=(\d{3})+(?!\d))/, ",")
   end
+
+  # 절감 시간 사람이 읽기 좋게(ms→s/m). 천단위 콤마.
+  defp fmt_ms(nil), do: "0ms"
+  defp fmt_ms(ms) when ms < 1000, do: "#{commafy(ms)}ms"
+  defp fmt_ms(ms) when ms < 60_000, do: "#{Float.round(ms / 1000, 1)}s"
+  defp fmt_ms(ms), do: "#{Float.round(ms / 60_000, 1)}분"
+
+  defp commafy(n) when is_integer(n) do
+    n |> Integer.to_string() |> String.replace(~r/\B(?=(\d{3})+(?!\d))/, ",")
+  end
+
+  defp commafy(n), do: to_string(n)
 
   defp role_icon("executor"), do: "🤖"
   defp role_icon("builder"), do: "🏗️"
@@ -309,6 +324,84 @@ defmodule OpenMesWeb.Connect.DureClawLive do
           >
             다시
           </button>
+        </div>
+      </div>
+
+      <%!-- 📊 스킬 결정화 현황 — RSI 학습 루프 누적(상시 대시보드) --%>
+      <div
+        :if={@snap.connected}
+        class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4"
+      >
+        <div class="text-sm font-bold text-zinc-900">📊 스킬 결정화 현황 — RSI 학습 루프</div>
+        <div class="text-xs text-zinc-500">
+          승인된 결정을 <span class="font-semibold text-emerald-700">결정론적 룰로 동결</span>
+          → 같은 패턴은 <span class="font-semibold text-emerald-700">LLM 0회</span>로 재사용. "LLM as compiler" 의 누적 산출.
+        </div>
+
+        <%!-- 요약 카드 --%>
+        <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div class="rounded-lg bg-white p-3 text-center">
+            <div class="text-2xl font-bold text-emerald-700">{@cryst.rule_count}</div>
+            <div class="text-xs text-zinc-500">동결 룰</div>
+          </div>
+          <div class="rounded-lg bg-white p-3 text-center">
+            <div class="text-2xl font-bold text-emerald-700">{commafy(@cryst.total_hits)}</div>
+            <div class="text-xs text-zinc-500">LLM 절감(회)</div>
+          </div>
+          <div class="rounded-lg bg-white p-3 text-center">
+            <div class="text-2xl font-bold text-emerald-700">{fmt_ms(@cryst.saved_ms)}</div>
+            <div class="text-xs text-zinc-500">절감 시간</div>
+          </div>
+          <div class="rounded-lg bg-white p-3 text-center">
+            <div class="text-2xl font-bold text-emerald-700">
+              {if @cryst.avg_hit_us, do: "#{commafy(@cryst.avg_hit_us)}µs", else: "—"}
+            </div>
+            <div class="text-xs text-zinc-500">평균 캐시 히트</div>
+          </div>
+        </div>
+
+        <%!-- 동결 룰 테이블 --%>
+        <div :if={@cryst.rules != []} class="mt-3 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="text-zinc-500">
+              <tr class="border-b border-zinc-200">
+                <th class="py-1 pr-3 font-medium">패턴</th>
+                <th class="py-1 pr-3 font-medium">권고</th>
+                <th class="py-1 pr-3 text-right font-medium">원 LLM</th>
+                <th class="py-1 pr-3 text-right font-medium">재사용</th>
+                <th class="py-1 pr-3 text-right font-medium">누적 절감</th>
+                <th class="py-1 pr-3 font-medium">승인</th>
+                <th class="py-1 font-medium">동결 시각</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr :for={r <- @cryst.rules} class="border-b border-zinc-100">
+                <td class="py-1.5 pr-3 font-mono text-zinc-800">{r.pattern}</td>
+                <td class="py-1.5 pr-3">
+                  <span class="rounded bg-rose-100 px-1.5 py-0.5 font-semibold text-rose-700">
+                    {r.decision["action"]}
+                  </span>
+                </td>
+                <td class="py-1.5 pr-3 text-right font-mono text-zinc-600">
+                  {if r[:llm_ms], do: "#{commafy(r.llm_ms)}ms", else: "—"}
+                </td>
+                <td class="py-1.5 pr-3 text-right font-mono font-semibold text-emerald-700">
+                  {r[:hits] || 0}회
+                </td>
+                <td class="py-1.5 pr-3 text-right font-mono text-emerald-700">
+                  {fmt_ms((r[:hits] || 0) * (r[:llm_ms] || 0))}
+                </td>
+                <td class="py-1.5 pr-3 text-zinc-600">{r[:approved_by]}</td>
+                <td class="py-1.5 font-mono text-zinc-400">{r[:frozen_at]}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div
+          :if={@cryst.rules == []}
+          class="mt-3 rounded-lg bg-white p-3 text-center text-xs text-zinc-400"
+        >
+          아직 동결된 룰이 없습니다. 위 <span class="font-semibold text-rose-600">불량 조사 → 승인</span>하면 여기 쌓입니다.
         </div>
       </div>
 

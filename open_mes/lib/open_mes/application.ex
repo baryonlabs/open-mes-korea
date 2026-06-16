@@ -15,7 +15,7 @@ defmodule OpenMes.Application do
         {Phoenix.PubSub, name: OpenMes.PubSub},
         # Start to serve requests, typically the last entry
         OpenMesWeb.Endpoint
-      ] ++ ingest_children() ++ media_children()
+      ] ++ ingest_children() ++ media_children() ++ dureclaw_children()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -50,6 +50,17 @@ defmodule OpenMes.Application do
         OpenMes.Media.Watch.Scanner,
         OpenMes.Media.Transfer.Dispatcher
       ]
+    else
+      []
+    end
+  end
+
+  # ── EXT-5(DureClaw 연동) 조건부 child ─────────────────────────────────────
+  # SkillCache ETS 테이블 소유자만 기동(동결 룰이 요청 프로세스 수명과 무관하게 생존).
+  # enabled?==false(기본)면 빈 리스트 → 코어 영향 0. 소유 전용 프로세스라 crash 면 0.
+  defp dureclaw_children do
+    if OpenMes.Connect.DureClaw.enabled?() do
+      [OpenMes.Connect.DureClaw.SkillCache.Server]
     else
       []
     end
