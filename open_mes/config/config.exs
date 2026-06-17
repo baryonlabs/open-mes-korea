@@ -100,7 +100,31 @@ config :open_mes, OpenMes.Addons.EquipmentOee, enabled: true
 config :open_mes, OpenMes.Addons.DailyProductionSummary, enabled: false
 
 # ── EXT-5 연동 허브 게이트 (DureClaw) — 버스 주소는 env BUS_URL/OAH_SECRET ──
-config :open_mes, OpenMes.Connect.DureClaw, enabled: true
+# equipment_map: 에이전트 ↔ 설비 의미론적 바인딩(C). 코어 DB 읽기 0(config 기반).
+#   "pi-zero 는 PRESS-01(사출기 금형온도·거리센서)를 센싱 중" 같은 상황정보를 dispatch·모니터에 주입.
+config :open_mes, OpenMes.Connect.DureClaw,
+  enabled: true,
+  # equipment_map (C): 에이전트 ↔ 설비 의미론적 바인딩.
+  equipment_map: %{
+    "executor@pi-zero" => %{code: "PRESS-01", purpose: "사출기 금형온도·거리센서(HC-SR04)"},
+    "sensor@pi-zero" => %{code: "PRESS-01", purpose: "사출기 금형온도·거리센서(HC-SR04)"},
+    "builder@linux-builder" => %{code: "VISION-01", purpose: "비전 검사 GPU"},
+    "builder@NUCBOXG3" => %{code: "LINE-PC-01", purpose: "현장 PC·작업지시"},
+    "serialfeed@windows" => %{code: "LINE-PC-02", purpose: "시리얼 피드·현장 PC"},
+    "builder@docker-arm64" => %{code: "FILTER-01", purpose: "1차 필터 노드"},
+    "brain@hong-macbookpro" => %{code: "MASTER", purpose: "종합 브레인"}
+  },
+  # model_map (A): 에이전트별 모델 명시 지정. 미설정 노드는 capability 기본 정책으로 폴백.
+  #   비용·주권 정책 — 종합=강한 모델 · 1차 필터=싼 모델 · 민감=온프레미스.
+  model_map: %{
+    "brain@hong-macbookpro" => "claude-opus-4-8",
+    "builder@docker-arm64" => "claude-haiku-4-5",
+    "builder@NUCBOXG3" => "claude-haiku-4-5",
+    "serialfeed@windows" => "claude-haiku-4-5",
+    "builder@linux-builder" => "ollama:llama3",
+    "sensor@pi-zero" => "claude-haiku-4-5",
+    "executor@pi-zero" => "claude-haiku-4-5"
+  }
 
 # AI Provider(설계 23번) — impl: nil 이면 키 존재 여부로 결정(키 없으면 MockProvider 기본).
 config :open_mes, OpenMes.Ai.Provider, impl: nil

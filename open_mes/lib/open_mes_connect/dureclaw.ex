@@ -17,6 +17,10 @@ defmodule OpenMes.Connect.DureClaw do
   실제 화면은 `OpenMesWeb.Connect.DureClawLive`, 메타데이터는 `.Extension` 이 담당한다.
   """
 
+  alias OpenMes.Connect.DureClaw.SkillCache
+  alias OpenMes.Connect.DureClaw.Orchestrator
+  alias OpenMes.Connect.DureClaw.EventLog
+
   @timeout_ms 1500
   # 결과 폴링: fan-in 은 병렬(collect_all)이라 전체 대기 = 가장 느린 1개(합산 아님).
   # observer·원격 노드는 task.result 를 안 올리므로 *항상* 상한에 걸린다 → 상한 = 무대 대기시간.
@@ -44,17 +48,38 @@ defmodule OpenMes.Connect.DureClaw do
   def snapshot do
     case base() do
       {:ok, http, headers} ->
+        wk = (get_json(http, "/api/work-keys/latest", headers) || %{})["work_key"]
+
         %{
           connected: true,
           bus_url: http,
           health: get_json(http, "/api/health", headers) || %{},
           agents: (get_json(http, "/api/presence", headers) || %{})["agents"] || [],
-          work_keys: (get_json(http, "/api/work-keys", headers) || %{})["work_keys"] || []
+          work_keys: (get_json(http, "/api/work-keys", headers) || %{})["work_keys"] || [],
+          dashboard_url: dashboard_url(http, wk)
         }
 
       :disabled ->
-        %{connected: false, bus_url: nil, health: %{}, agents: [], work_keys: []}
+        %{
+          connected: false,
+          bus_url: nil,
+          health: %{},
+          agents: [],
+          work_keys: [],
+          dashboard_url: nil
+        }
     end
+  end
+
+  # 버스 대시보드 딥링크 — http(BUS_URL) + token(OAH_SECRET) + 최신 work_key.
+  # 버스가 `?token=` 인증을 쓰므로 같은 방식(로컬 데모 편의). work_key 없으면 token 만.
+  defp dashboard_url(http, work_key) do
+    secret = System.get_env("OAH_SECRET", "")
+
+    params =
+      [{"token", secret}] ++ if(work_key, do: [{"work_key", work_key}], else: [])
+
+    "#{http}/dashboard?#{URI.encode_query(params)}"
   end
 
   @doc """
@@ -73,24 +98,30 @@ defmodule OpenMes.Connect.DureClaw do
     case base() do
       {:ok, http, headers} when instructions != "" ->
         wk = (get_json(http, "/api/work-keys/latest", headers) || %{})["work_key"]
-        agents = (get_json(http, "/api/presence", headers) || %{})["agents"] || []
+        all_agents = (get_json(http, "/api/presence", headers) || %{})["agents"] || []
+
+        # ① 목적별 선택 라우팅(A) — 프롬프트 의도에 맞는 노드만 고른다(없으면 전체).
+        agents = Orchestrator.route(all_agents, instructions)
 
         dispatched =
           Enum.map(agents, fn a ->
             name = a["name"]
+            caps = a["capabilities"] || []
             tid = "mes-#{System.system_time(:millisecond)}-#{String.replace(name, ~r/\W/, "_")}"
 
             # 자유 프롬프트가 그대로 instructions 로 전달된다. 진짜 oah-agent(claude/codex/…)는
-            # 이를 읽어 실행하고, sim 워커는 무시하고 ack 한다.
+            # 이를 읽어 실행하고, sim 워커는 무시하고 ack 한다. backend 힌트(A)는 존중 시 적용.
             assign(http, headers, %{
               "to" => name,
               "role" => a["role"],
               "work_key" => wk,
               "task_id" => tid,
-              "instructions" => instructions
+              "instructions" => instructions,
+              "backend" => Orchestrator.backend_for(name, caps),
+              "model" => Orchestrator.model_for(name, caps)
             })
 
-            %{agent: name, role: a["role"], caps: a["capabilities"] || [], task_id: tid}
+            %{agent: name, role: a["role"], caps: caps, task_id: tid}
           end)
 
         %{
@@ -116,8 +147,6 @@ defmodule OpenMes.Connect.DureClaw do
   반환(미스): `%{mode: :llm, pattern, work_key, lot, observations, suggest, llm_ms}`
   반환(히트): `%{mode: :crystallized, pattern, lot, suggest, hit_us, llm_ms, frozen_at}` — LLM 0회.
   """
-  alias OpenMes.Connect.DureClaw.SkillCache
-
   def dispatch_investigation(lot_no) do
     lot = String.trim(to_string(lot_no))
     key = defect_pattern(lot)
@@ -151,7 +180,9 @@ defmodule OpenMes.Connect.DureClaw do
           Enum.map(agents, fn a ->
             name = a["name"]
             caps = a["capabilities"] || []
-            {label, task} = role_task(caps, lot)
+
+            # ① 오케스트레이션 레이어 — 설비 맥락 주입(C) + 에이전트별 모델/백엔드 지정(A)
+            {label, task, backend, model} = Orchestrator.role_task(caps, lot, name)
 
             tid =
               "mes-inv-#{System.system_time(:millisecond)}-#{String.replace(name, ~r/\W/, "_")}"
@@ -161,7 +192,9 @@ defmodule OpenMes.Connect.DureClaw do
               "role" => a["role"],
               "work_key" => wk,
               "task_id" => tid,
-              "instructions" => task
+              "instructions" => task,
+              "backend" => backend,
+              "model" => model
             })
 
             %{agent: name, role: a["role"], caps: caps, role_task: label, task_id: tid}
@@ -184,24 +217,7 @@ defmodule OpenMes.Connect.DureClaw do
     end
   end
 
-  # 엣지 capability → (역할 라벨, 짧은 역할별 지시). 짧게 = 실 Claude 도 빠르게.
-  defp role_task(caps, lot) do
-    cond do
-      caps_any?(caps, ["camera", "edge", "gpio", "led"]) ->
-        {"엣지 검사", "LOT #{lot} 외관 검사: 스크래치 의심 여부와 감지 센서를 한 줄로 답해줘."}
-
-      caps_any?(caps, ["vision", "nvidia-gpu"]) ->
-        {"비전 분석", "LOT #{lot} 비전: 스크래치 점수(0~1)와 위치를 한 줄로 답해줘."}
-
-      caps_any?(caps, ["genealogy", "mes"]) ->
-        {"LOT 계보", "LOT #{lot} 계보 역추적: 공통 원자재 LOT과 영향 작업지시를 한 줄로 답해줘."}
-
-      true ->
-        {"보조 분석", "LOT #{lot} 불량 분석 보조: 핵심 한 줄."}
-    end
-  end
-
-  defp caps_any?(caps, keys), do: Enum.any?(keys, &(&1 in caps))
+  # 역할별 지시·설비 맥락·라우팅은 ① 오케스트레이션 레이어(Orchestrator)로 이관됨.
 
   # 골든 시나리오 종합 (결정론적 — 무대 안정). 골든 LOT 이 아니면 nil.
   defp golden_suggest("A-2026-1031") do
@@ -238,7 +254,25 @@ defmodule OpenMes.Connect.DureClaw do
   @doc "동결 룰 해제(데모 리셋용)."
   def forget(lot_no), do: SkillCache.forget(defect_pattern(to_string(lot_no)))
 
+  @doc "fleet 통신·대화 디버그 로그(최신 우선). 모니터 패널용."
+  def recent_events(n \\ 40), do: EventLog.recent(n)
+
+  @doc "노드의 설비 의미론적 상황 한 줄(없으면 nil). 모니터 노드 보드용."
+  def node_situation(agent_name), do: Orchestrator.equipment_context(agent_name)
+
+  @doc "노드에 지정된 모델(명시 지정 우선 → capability 기본). 모니터 노드 보드용."
+  def node_model(agent_name, caps), do: Orchestrator.model_for(agent_name, caps)
+
   defp assign(http, headers, body) do
+    # 디버그 모니터 — 송신(task.assign) 기록. 지시 텍스트는 앞부분만.
+    EventLog.put(:assign, %{
+      to: body["to"],
+      backend: body["backend"],
+      model: body["model"],
+      task_id: body["task_id"],
+      text: String.slice(to_string(body["instructions"]), 0, 140)
+    })
+
     Req.post!("#{http}/api/task", headers: headers, json: body, receive_timeout: @timeout_ms)
   rescue
     _ -> :error
@@ -274,10 +308,31 @@ defmodule OpenMes.Connect.DureClaw do
         end
       end)
 
+    # 디버그 모니터 — 수신(task.result) 기록. 응답 요약 한 줄.
+    EventLog.put(:result, %{
+      from: item[:agent],
+      task_id: tid,
+      ok: not is_nil(result),
+      text: event_text(result)
+    })
+
     Map.put(item, :result, result)
   rescue
     _ -> Map.put(item, :result, nil)
   end
+
+  # task.result 본문 → 모니터용 한 줄 요약.
+  defp event_text(nil), do: "(응답 없음 — 타임아웃)"
+
+  defp event_text(%{} = r) do
+    cond do
+      is_binary(r["output"]) -> String.slice(r["output"], 0, 160)
+      r["status"] -> "status=#{r["status"]}"
+      true -> "완료"
+    end
+  end
+
+  defp event_text(_), do: "완료"
 
   defp base do
     case System.get_env("BUS_URL") do

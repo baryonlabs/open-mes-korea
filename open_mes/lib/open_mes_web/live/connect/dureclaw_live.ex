@@ -31,7 +31,11 @@ defmodule OpenMesWeb.Connect.DureClawLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket), do: Process.send_after(self(), :poll, @poll_ms)
+    if connected?(socket) do
+      Process.send_after(self(), :poll, @poll_ms)
+      # 통신·대화 피드는 3초 폴링이 아니라 PubSub 실시간 push 로 갱신.
+      Phoenix.PubSub.subscribe(OpenMes.PubSub, OpenMes.Connect.DureClaw.EventLog.topic())
+    end
 
     {:ok,
      assign(socket,
@@ -43,14 +47,23 @@ defmodule OpenMesWeb.Connect.DureClawLive do
        dispatch: nil,
        istatus: :idle,
        inv: nil,
-       cryst: DureClaw.crystallization_stats()
+       cryst: DureClaw.crystallization_stats(),
+       mon: false,
+       events: DureClaw.recent_events()
      )}
   end
 
   @impl true
   def handle_info(:poll, socket) do
     Process.send_after(self(), :poll, @poll_ms)
+
+    # 노드 상황 보드·대시보드만 3초 폴링. 통신 피드(events)는 PubSub push 로 별도 갱신.
     {:noreply, assign(socket, snap: DureClaw.snapshot(), cryst: DureClaw.crystallization_stats())}
+  end
+
+  # 통신·대화 이벤트 실시간 push — 기록 즉시 피드 맨 앞에 추가(폴링 지연 0).
+  def handle_info({:dureclaw_event, ev}, socket) do
+    {:noreply, assign(socket, events: [ev | socket.assigns.events] |> Enum.take(60))}
   end
 
   # 비동기 fan-out/fan-in 완료
@@ -61,12 +74,19 @@ defmodule OpenMesWeb.Connect.DureClawLive do
   def handle_info({:inv_done, result}, socket) do
     # 결정화 재사용(캐시 히트)은 hits 를 증가시키므로 대시보드도 갱신.
     {:noreply,
-     assign(socket, istatus: :done, inv: result, cryst: DureClaw.crystallization_stats())}
+     assign(socket,
+       istatus: :done,
+       inv: result,
+       cryst: DureClaw.crystallization_stats()
+     )}
   end
 
   @impl true
   def handle_event("refresh", _params, socket),
-    do: {:noreply, assign(socket, snap: DureClaw.snapshot())}
+    do: {:noreply, assign(socket, snap: DureClaw.snapshot(), events: DureClaw.recent_events())}
+
+  def handle_event("toggle_mon", _p, socket),
+    do: {:noreply, assign(socket, mon: not socket.assigns.mon, events: DureClaw.recent_events())}
 
   # 불량 조사 (역할별 차등 지시 → fan-in → 종합) — RSI 1차 leg
   def handle_event("investigate", _p, socket) do
@@ -195,12 +215,106 @@ defmodule OpenMesWeb.Connect.DureClawLive do
             {@snap.bus_url} · v{@snap.health["version"]} · work_keys {@snap.health["work_keys"]}
           </div>
         </div>
-        <button
-          phx-click="refresh"
-          class="ml-auto rounded border border-zinc-300 px-3 py-1 text-xs hover:bg-zinc-100"
-        >
-          새로고침
-        </button>
+        <div class="ml-auto flex items-center gap-2">
+          <a
+            :if={@snap[:dashboard_url]}
+            href={@snap.dashboard_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-lg bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-500"
+          >
+            버스 대시보드 ↗
+          </a>
+          <button
+            phx-click="toggle_mon"
+            class={[
+              "rounded-lg px-3 py-1 text-xs font-semibold",
+              @mon && "bg-zinc-900 text-white hover:bg-zinc-700",
+              !@mon && "border border-zinc-300 text-zinc-700 hover:bg-zinc-100"
+            ]}
+          >
+            🔍 디버그 모니터
+          </button>
+          <button
+            phx-click="refresh"
+            class="rounded border border-zinc-300 px-3 py-1 text-xs hover:bg-zinc-100"
+          >
+            새로고침
+          </button>
+        </div>
+      </div>
+
+      <%!-- 🔍 디버그 모니터 — 노드 상황 + 통신·대화 피드 (Observer 의도를 원격 fleet 용 웹으로) --%>
+      <div
+        :if={@mon and @snap.connected}
+        class="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-zinc-200"
+      >
+        <div class="mb-3 flex items-center justify-between">
+          <div class="text-sm font-bold">🔍 디버그 모니터 — fleet 상태 · 통신 (라이브 3초)</div>
+          <div class="font-mono text-xs text-zinc-500">
+            remote nodes ≠ BEAM procs → Observer 대신 웹 트레이스
+          </div>
+        </div>
+
+        <%!-- 노드 상황 보드 --%>
+        <div class="mb-3 text-xs font-semibold text-zinc-400">▸ 노드 상황 (각 엣지가 무엇을 센싱/실행 중인가)</div>
+        <div class="mb-4 overflow-hidden rounded-lg border border-zinc-700">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-zinc-800 text-zinc-400">
+              <tr>
+                <th class="px-3 py-1.5 font-medium">노드</th>
+                <th class="px-3 py-1.5 font-medium">role</th>
+                <th class="px-3 py-1.5 font-medium">설비 상황</th>
+                <th class="px-3 py-1.5 font-medium">model</th>
+                <th class="px-3 py-1.5 font-medium">conn</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr :for={a <- @snap.agents} class="border-t border-zinc-800">
+                <td class="px-3 py-1.5 font-mono text-emerald-300">{a["name"]}</td>
+                <td class="px-3 py-1.5 text-zinc-400">{a["role"]}</td>
+                <td class="px-3 py-1.5">
+                  <span :if={DureClaw.node_situation(a["name"])} class="text-amber-300">
+                    🏭 {DureClaw.node_situation(a["name"])} 센싱 중
+                  </span>
+                  <span :if={!DureClaw.node_situation(a["name"])} class="text-zinc-600">
+                    (설비 미바인딩)
+                  </span>
+                </td>
+                <td class="px-3 py-1.5">
+                  <span class="rounded bg-indigo-500/20 px-1.5 py-0.5 font-mono text-indigo-300">
+                    {DureClaw.node_model(a["name"], a["capabilities"] || [])}
+                  </span>
+                </td>
+                <td class="px-3 py-1.5 font-mono text-zinc-600">{a["phx_ref"]}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <%!-- 통신·대화 피드 --%>
+        <div class="mb-2 text-xs font-semibold text-zinc-400">▸ 통신·대화 피드 (오케스트레이터 ⇄ 노드, 최신순)</div>
+        <div class="max-h-72 space-y-1 overflow-y-auto rounded-lg bg-black/40 p-2 font-mono text-xs">
+          <div :if={@events == []} class="px-2 py-3 text-center text-zinc-600">
+            아직 통신 없음 — 불량 조사/분석 지시를 누르면 task.assign / task.result 가 흐릅니다.
+          </div>
+          <div :for={e <- @events} class="flex items-start gap-2 px-1 py-0.5">
+            <span class="text-zinc-600">{e.at}</span>
+            <span :if={e.type == :assign} class="font-bold text-indigo-400">→ assign</span>
+            <span :if={e.type == :result and e[:ok]} class="font-bold text-emerald-400">
+              ← result
+            </span>
+            <span :if={e.type == :result and !e[:ok]} class="font-bold text-rose-400">← timeout</span>
+            <span class="text-emerald-300">{e[:to] || e[:from]}</span>
+            <span :if={e[:model]} class="rounded bg-indigo-500/20 px-1 text-indigo-300">
+              {e[:model]}
+            </span>
+            <span :if={e[:backend]} class="rounded bg-zinc-700 px-1 text-zinc-400">
+              {e[:backend]}
+            </span>
+            <span class="flex-1 truncate text-zinc-400">{e[:text]}</span>
+          </div>
+        </div>
       </div>
 
       <%!-- ★ 불량 조사 (역할별 센싱 → 종합) — 데모 클라이맥스 / RSI 1차 leg --%>

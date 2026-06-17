@@ -132,30 +132,30 @@ defmodule OpenMes.Connect.DureClaw.SkillCache.Server do
   @moduledoc """
   SkillCache ETS 테이블 소유자(감독 트리 child). init 에서 테이블을 생성·소유만 하고 idle.
 
-  목적: 동결 룰이 *전송 프로세스 수명*(LiveView·Task)과 무관하게 살아남게 한다 —
-  대시보드 상시 표시 + 페이지 reload 후에도 룰 유지. 핫패스는 여전히 직접 ETS(GenServer
-  호출 0). crash 유발 콜백 없음(MES.Bus 교훈: 소유 전용, 로직 0).
+  목적: 동결 룰(SkillCache)과 통신 로그(EventLog)가 *전송 프로세스 수명*(LiveView·Task)과
+  무관하게 살아남게 한다 — 대시보드·디버그 모니터 상시 표시 + reload 후에도 유지. 핫패스는
+  여전히 직접 ETS(GenServer 호출 0). crash 유발 콜백 없음(MES.Bus 교훈: 소유 전용, 로직 0).
 
   config 게이트로 DureClaw 확장 enabled 시에만 application.ex 가 기동(코어 비침투).
   """
   use GenServer
 
   alias OpenMes.Connect.DureClaw.SkillCache
+  alias OpenMes.Connect.DureClaw.EventLog
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
   @impl true
   def init(_opts) do
-    table = SkillCache.table()
+    own(SkillCache.table(), :set)
+    own(EventLog.table(), :ordered_set)
+    {:ok, %{tables: [SkillCache.table(), EventLog.table()]}}
+  end
 
+  defp own(table, type) do
     case :ets.whereis(table) do
-      :undefined ->
-        :ets.new(table, [:named_table, :public, :set, read_concurrency: true])
-
-      _ ->
-        :ok
+      :undefined -> :ets.new(table, [:named_table, :public, type, read_concurrency: true])
+      _ -> :ok
     end
-
-    {:ok, %{table: table}}
   end
 end
