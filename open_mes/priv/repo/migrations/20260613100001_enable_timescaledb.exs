@@ -13,7 +13,19 @@ defmodule OpenMes.Repo.Migrations.EnableTimescaledb do
   use Ecto.Migration
 
   def up do
-    execute "CREATE EXTENSION IF NOT EXISTS timescaledb;"
+    # timescaledb 가 설치된 환경에서만 확장을 만든다. 미설치(예: 평문 PostgreSQL·Postgres.app
+    # 개발환경)에서는 건너뛴다 — EXT-1(설비수집) 기본 비활성이라 코어/admin 동작에 무방.
+    execute """
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'timescaledb') THEN
+        CREATE EXTENSION IF NOT EXISTS timescaledb;
+      ELSE
+        RAISE NOTICE 'timescaledb 미설치 — 확장 생성 건너뜀(EXT-1 비활성 환경)';
+      END IF;
+    END
+    $$;
+    """
   end
 
   def down do

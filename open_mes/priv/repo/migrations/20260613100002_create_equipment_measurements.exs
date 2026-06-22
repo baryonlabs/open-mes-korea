@@ -35,6 +35,7 @@ defmodule OpenMes.Repo.Migrations.CreateEquipmentMeasurements do
       add :measured_at, :utc_datetime_usec, null: false
       # 서버 수집 시각(수집 지연 측정용)
       add :ingested_at, :utc_datetime_usec, null: false
+
       # (옵션) 수집 시점 작업지시 컨텍스트. 디바이스가 보내면 보존. FK 없음.
       add :work_order_id, :binary_id
       # 디바이스 부가 정보(라인/슬롯 등). 스키마 유연성 확보.
@@ -45,10 +46,18 @@ defmodule OpenMes.Repo.Migrations.CreateEquipmentMeasurements do
     create index(:equipment_measurements, [:equipment_id, :metric_key, :measured_at])
 
     # hypertable 전환. chunk 7일 간격은 시작값(데이터량 보고 후속 조정).
+    # timescaledb 설치 환경에서만 전환하고, 미설치(평문 PostgreSQL) 환경에서는 일반 테이블로
+    # 둔다 — EXT-1(설비수집) 기본 비활성이라 무방. 운영(timescaledb) 환경은 그대로 hypertable.
     execute """
-    SELECT create_hypertable('equipment_measurements', 'measured_at',
-      chunk_time_interval => INTERVAL '7 days',
-      if_not_exists => TRUE);
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'timescaledb') THEN
+        PERFORM create_hypertable('equipment_measurements', 'measured_at',
+          chunk_time_interval => INTERVAL '7 days',
+          if_not_exists => TRUE);
+      END IF;
+    END
+    $$;
     """
 
     # value / string_value 중 하나는 반드시 존재(최후 방어선; 1차 검증은 앱 Validator).
