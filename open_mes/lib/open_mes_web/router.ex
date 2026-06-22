@@ -237,6 +237,16 @@ defmodule OpenMesWeb.Router do
     end
   end
 
+  # ── 애드온 ⑥ CAD 견적 BOM ──────────────────────────────────────────────
+  if OpenMes.Addons.CadBom.Extension.enabled?() do
+    scope "/extensions", OpenMesWeb.Addons do
+      pipe_through :browser
+
+      live "/cad-bom", CadBomLive, :index
+      post "/cad-bom/download", CadBomController, :download
+    end
+  end
+
   # ── EXT-5 연동 허브: DureClaw 분산 오케스트레이션 ────────────────────────
   if OpenMes.Connect.DureClaw.Extension.enabled?() do
     scope "/extensions", OpenMesWeb.Connect do

@@ -65,6 +65,7 @@ config :open_mes, :extensions, [
   OpenMes.Addons.LotQrLabel.Extension,
   OpenMes.Addons.EquipmentOee.Extension,
   OpenMes.Addons.DailyProductionSummary.Extension,
+  OpenMes.Addons.CadBom.Extension,
   # EXT-5 연동 허브 (integration)
   OpenMes.Connect.DureClaw.Extension
 ]
@@ -97,6 +98,7 @@ config :open_mes, OpenMes.Addons.WoCsvExport, enabled: true
 config :open_mes, OpenMes.Addons.DefectStats, enabled: true
 config :open_mes, OpenMes.Addons.LotQrLabel, enabled: true
 config :open_mes, OpenMes.Addons.EquipmentOee, enabled: true
+config :open_mes, OpenMes.Addons.CadBom, enabled: true
 config :open_mes, OpenMes.Addons.DailyProductionSummary, enabled: false
 
 # ── EXT-5 연동 허브 게이트 (DureClaw) — 버스 주소는 env BUS_URL/OAH_SECRET ──
