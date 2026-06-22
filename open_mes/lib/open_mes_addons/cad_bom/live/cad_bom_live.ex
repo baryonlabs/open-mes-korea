@@ -25,7 +25,7 @@ defmodule OpenMesWeb.Addons.CadBomLive do
      |> assign(page_title: "CAD 견적 BOM")
      |> assign(extract_files: [], extract_errors: [], extract_error: nil, selected: %{})
      |> assign_text("")
-     |> allow_upload(:cad, accept: ~w(.dxf .dwg), max_entries: 30, max_file_size: 60_000_000)}
+     |> allow_upload(:cad, accept: :any, max_entries: 30, max_file_size: 60_000_000)}
   end
 
   @impl true
