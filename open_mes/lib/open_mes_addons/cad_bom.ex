@@ -14,7 +14,11 @@ defmodule OpenMes.Addons.CadBom do
     - config on/off 게이트. 읽기/변환 전용이라 운영상 안전.
   """
 
-  alias OpenMes.Addons.CadBom.{Parser, Classifier, Csv}
+  alias OpenMes.Addons.CadBom.{Parser, Classifier, Csv, Extractor, Xlsx}
+
+  @doc "업로드된 CAD(DXF/DWG) 파일 경로들을 추출해 부품 행으로. `Extractor` 위임."
+  @spec extract_files([Path.t()]) :: {:ok, map()} | {:error, String.t()}
+  defdelegate extract_files(paths), to: Extractor, as: :extract
 
   @doc """
   애드온 활성 여부(config 게이트).
@@ -43,10 +47,13 @@ defmodule OpenMes.Addons.CadBom do
       }
   """
   @spec analyze(String.t()) :: %{rows: [map()], by_process: [map()], total: non_neg_integer()}
-  def analyze(text) when is_binary(text) do
+  def analyze(text) when is_binary(text), do: analyze_rows(Parser.parse(text))
+
+  @doc "이미 추출된 부품 행(예: `Extractor`)을 분류·통합한다. `analyze/1` 과 동일 결과 구조."
+  @spec analyze_rows([map()]) :: %{rows: [map()], by_process: [map()], total: non_neg_integer()}
+  def analyze_rows(rows) when is_list(rows) do
     rows =
-      text
-      |> Parser.parse()
+      rows
       |> Enum.map(&Map.put(&1, :공정, Classifier.process(&1)))
       |> integrate()
 
@@ -67,12 +74,65 @@ defmodule OpenMes.Addons.CadBom do
     |> Csv.quote_group(process)
   end
 
-  @doc "다운로드 파일명. kind 는 \"통합\" 또는 공정명."
-  @spec filename(String.t(), DateTime.t()) :: String.t()
-  def filename(kind, now \\ DateTime.utc_now()) do
+  @doc "통합 BOM 엑셀(.xlsx) 바이너리."
+  @spec to_integrated_xlsx(String.t()) :: binary()
+  def to_integrated_xlsx(text) do
+    rows = text |> analyze() |> Map.fetch!(:rows)
+
+    body =
+      Enum.map(rows, fn r ->
+        [r.품번, r.품명, r.분류, r.공정, r.수량, r.재질, r.규격, r.발주처, r.모델]
+      end)
+
+    Xlsx.build("통합 BOM", ~w(품번 품명 분류 발주공정 수량 재질 규격 발주처 모델), body)
+  end
+
+  @doc "특정 공정 견적 BOM 엑셀(.xlsx) 바이너리(단가/금액 빈칸)."
+  @spec to_quote_xlsx(String.t(), String.t()) :: binary()
+  def to_quote_xlsx(text, process) do
+    body =
+      text
+      |> analyze()
+      |> Map.fetch!(:rows)
+      |> Enum.filter(&(&1.공정 == process))
+      |> Enum.map(fn r -> [r.품번, r.품명, r.규격, r.재질, r.수량, "", "", ""] end)
+
+    Xlsx.build("견적_#{process}", ~w(품번 품명 규격 재질 수량 단가 금액 비고), body)
+  end
+
+  @doc """
+  추출된 부품 행을 인덱스 CSV 문자열로 직렬화한다.
+
+  업로드→추출 흐름이 만든 행을 v1 의 인덱스 텍스트(도번,도면명,분류,…)로 바꿔,
+  화면/다운로드의 기존 분석·CSV·엑셀 기계를 그대로 재사용한다.
+  """
+  @spec rows_to_index([map()]) :: String.t()
+  def rows_to_index(rows) do
+    header = "도번,도면명,분류,수량,재질,규격,발주처,모델"
+
+    body =
+      Enum.map_join(rows, "\n", fn r ->
+        [r.품번, r.품명, r.분류, r.수량, r.재질, r.규격, r.발주처, r.모델]
+        |> Enum.map_join(",", &csv_field/1)
+      end)
+
+    header <> "\n" <> body
+  end
+
+  defp csv_field(v) do
+    s = to_string(v)
+
+    if String.contains?(s, [",", "\"", "\n"]),
+      do: "\"" <> String.replace(s, "\"", "\"\"") <> "\"",
+      else: s
+  end
+
+  @doc "다운로드 파일명. kind 는 \"통합\" 또는 공정명. ext 는 \"csv\"|\"xlsx\"."
+  @spec filename(String.t(), String.t(), DateTime.t()) :: String.t()
+  def filename(kind, ext \\ "csv", now \\ DateTime.utc_now()) do
     stamp = now |> DateTime.truncate(:second) |> Calendar.strftime("%Y%m%d_%H%M%S")
     safe = kind |> String.replace(~r/[^\p{L}\p{N}]+/u, "_") |> String.trim("_")
-    "BOM_#{safe}_#{stamp}.csv"
+    "BOM_#{safe}_#{stamp}.#{ext}"
   end
 
   @doc "데모용 샘플 CAD 인덱스(드림텍 CNC HAND 개조 일부)."
@@ -119,10 +179,13 @@ defmodule OpenMes.Addons.CadBom do
   @order %{
     "가공외주" => 0,
     "레이저절단" => 1,
-    "부품제작/구매" => 2,
-    "표준품구매" => 3,
+    "커팅" => 2,
+    "절곡" => 3,
+    "용접" => 4,
+    "부품제작/구매" => 5,
+    "표준품구매" => 6,
     "기타" => 8,
     "승인도(참고)" => 9
   }
-  defp process_order(proc), do: Map.get(@order, proc, 5)
+  defp process_order(proc), do: Map.get(@order, proc, 7)
 end

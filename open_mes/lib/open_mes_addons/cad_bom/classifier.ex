@@ -25,6 +25,9 @@ defmodule OpenMes.Addons.CadBom.Classifier do
 
     cond do
       String.contains?(c, "레이저") -> "레이저절단"
+      String.contains?(c, ["커팅", "절단"]) -> "커팅"
+      String.contains?(c, "절곡") -> "절곡"
+      String.contains?(c, "용접") -> "용접"
       standard_part?(n) -> "표준품구매"
       String.contains?(c, "가공") -> "가공외주"
       String.contains?(c, "승인") -> "승인도(참고)"

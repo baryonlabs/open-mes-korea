@@ -18,20 +18,30 @@ defmodule OpenMesWeb.Addons.CadBomController do
     if CadBom.enabled?() do
       text = Map.get(params, "cad_index", "")
       kind = Map.get(params, "kind", "통합")
+      fmt = Map.get(params, "fmt", "csv")
 
-      csv =
-        case kind do
-          "통합" -> CadBom.to_integrated_csv(text)
-          process -> CadBom.to_quote_csv(text, process)
-        end
+      {binary, ext, ctype} = build(text, kind, fmt)
 
       conn
-      |> send_download({:binary, IO.iodata_to_binary(csv)},
-        filename: CadBom.filename(kind),
-        charset: "utf-8"
-      )
+      |> put_resp_content_type(ctype)
+      |> send_download({:binary, binary}, filename: CadBom.filename(kind, ext), charset: "utf-8")
     else
       conn |> put_status(:not_found) |> text("CAD 견적 BOM 애드온이 비활성화되어 있습니다.")
     end
   end
+
+  # {바이너리, 확장자, content-type}
+  defp build(text, "통합", "xlsx"), do: {CadBom.to_integrated_xlsx(text), "xlsx", xlsx_ctype()}
+
+  defp build(text, process, "xlsx"),
+    do: {CadBom.to_quote_xlsx(text, process), "xlsx", xlsx_ctype()}
+
+  defp build(text, "통합", _csv),
+    do: {IO.iodata_to_binary(CadBom.to_integrated_csv(text)), "csv", "text/csv"}
+
+  defp build(text, process, _csv),
+    do: {IO.iodata_to_binary(CadBom.to_quote_csv(text, process)), "csv", "text/csv"}
+
+  defp xlsx_ctype,
+    do: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 end
