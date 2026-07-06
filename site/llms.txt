@@ -5,6 +5,8 @@
 > multi-industry extension.
 
 Canonical site: https://openmeskorea.org/
+Live demo: https://openmes-demo.fly.dev/ (public, resets daily; demo accounts and
+  password shown on the login page)
 Source repository: https://github.com/baryonlabs/open-mes-korea
 Default language: Korean
 Supported website languages: Korean, English, Japanese, Simplified Chinese,
@@ -37,6 +39,16 @@ functions.
   domain validation.
 - Allow on-premises or private-network deployment without mandatory production
   data transfer to an external SaaS service.
+
+## API and single source of truth (SSOT)
+
+Open MES Korea exposes a REST API so anyone can build their own agents that read
+work orders and adjust them directly. Every write requires an `X-Actor-Id` header,
+and that actor is recorded in the audit log. Audit log, event outbox, and backup
+together form a single source of truth (SSOT): however many agents act on the
+system, all state, history, and audit converge in one PostgreSQL database and stay
+portable via CSV and API. A runnable agent example lives at
+`examples/agents/work_order_agent.py` in the repository.
 
 ## Data sovereignty
 
