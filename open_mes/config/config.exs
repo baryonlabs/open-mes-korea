@@ -52,9 +52,17 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# ── 확장 레지스트리: 명시 목록(= 카탈로그 노출 대상, 7개 전체) ──────────────
-# "등록(이 리스트 포함) ≠ 활성(enabled?)". 비활성 확장도 카탈로그에 '비활성' 배지로 노출되므로
-# 7개를 항상 전부 넣는다. 켜고/끄기는 아래 게이트가 결정한다.
+# ── 확장 발견 모드(설계 30 §2.4) ──────────────────────────────────────────
+# :auto   — 로드된 OTP 앱을 스캔해 Extension behaviour 구현을 자동 발견(deps 한 줄로 끝).
+#           외부 repo 확장이 코어 수정 0 으로 붙는다(목표 상태 §1).
+# :manual — 아래 :extensions 명시 목록만 사용(되돌리기 포인트 — 완전 보수적).
+# escape hatch: :extra_extensions(강제 등록) / :exclude_extensions(제외) 는 두 모드 공통.
+config :open_mes, :extension_discovery, :auto
+
+# ── 확장 레지스트리: 명시 목록(:manual 모드 또는 :auto 미발견 보강용) ──────────
+# :auto 모드에선 자동 발견이 이 목록을 대체하지만, :manual 로 되돌리거나 발견 못 한 모듈을
+# 보강(:extra_extensions)할 때를 위해 단일 진실 목록으로 유지한다.
+# "등록(노출 대상) ≠ 활성(enabled?)". 비활성 확장도 카탈로그에 '비활성' 배지로 노출된다.
 config :open_mes, :extensions, [
   # EXT (인프라 의존, 기본 off)
   OpenMes.Ingest.Extension,

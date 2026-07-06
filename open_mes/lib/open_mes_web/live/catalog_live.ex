@@ -5,7 +5,7 @@ defmodule OpenMesWeb.CatalogLive do
   등록된 확장(EXT-1, EXT-2, 애드온 5개)을 카드로 렌더한다. 카테고리 필터와 활성/비활성
   배지를 제공하며, 자체 화면이 있고 활성인 확장은 "열기" 링크를 노출한다.
 
-  데이터 소스는 `OpenMes.Extensions.Registry.all/0` 하나뿐이다(비활성 포함 전체).
+  데이터 소스는 `OpenMes.Extension.Registry.all/0` 하나뿐이다(비활성 포함 전체).
   카탈로그는 도메인 쓰기를 하지 않는다 — 메타데이터 조회 + 렌더뿐(AuditLog/Outbox 무관).
 
   레이아웃: 다른 관리자 화면(/admin/*)과 동일하게 `OpenMesWeb.Admin.AdminLive` 베이스를
@@ -15,12 +15,12 @@ defmodule OpenMesWeb.CatalogLive do
   """
   use OpenMesWeb.Admin.AdminLive
 
-  alias OpenMes.Extensions.Registry
+  alias OpenMes.Extension.Registry
 
   # SDK 섹션의 "최소 확장" 코드 미리보기. 모듈 속성에 두어 HEEx 안 heredoc 들여쓰기 충돌을 피한다(pi).
   @sample_extension """
   defmodule MyExt.Extension do
-    use OpenMes.Extensions.Definition
+    use OpenMes.Extension.Definition
 
     def id, do: :addon_my_ext
     def name, do: "우리 회사 확장"
@@ -31,25 +31,36 @@ defmodule OpenMesWeb.CatalogLive do
   end
   """
 
-  # 카테고리 atom → 한국어 라벨. 새 카테고리는 여기에 한 줄 추가.
+  # known 카테고리 atom → 한국어 라벨. 미지 카테고리는 atom 폴백 라벨(아래 category_label/1).
+  # 새 코어 카테고리는 여기 + Extension.known_categories/0 에 추가.
   @category_labels %{
     ingest: "설비수집",
     media: "멀티미디어",
     production: "생산",
     quality: "품질",
     traceability: "추적",
-    analytics: "분석"
+    analytics: "분석",
+    integration: "연동"
   }
 
   @impl true
   def mount(_params, _session, socket) do
     entries = Registry.all()
 
+    # 동적 카테고리 칩: 등장한 카테고리의 합집합. known 우선 정렬, 미지는 뒤에(설계 30 §4).
+    # 외부 확장이 자유 카테고리를 써도 칩이 자동 생성된다(하드코딩 제거).
+    known = OpenMes.Extension.known_categories()
+
     categories =
       entries
       |> Enum.map(& &1.category)
       |> Enum.uniq()
-      |> Enum.sort()
+      |> Enum.sort_by(fn cat ->
+        case Enum.find_index(known, &(&1 == cat)) do
+          nil -> {1, to_string(cat)}
+          idx -> {0, idx}
+        end
+      end)
 
     {:ok,
      assign(socket,
@@ -185,7 +196,12 @@ defmodule OpenMesWeb.CatalogLive do
   defp open_link?(%{home_path: path, enabled: enabled}),
     do: enabled and is_binary(path) and path != ""
 
-  defp category_label(cat), do: Map.get(@category_labels, cat, to_string(cat))
+  # known 이면 한국어 라벨, 미지면 atom 폴백(`:my_cat` → "my cat").
+  defp category_label(cat) do
+    Map.get_lazy(@category_labels, cat, fn ->
+      cat |> to_string() |> String.replace("_", " ")
+    end)
+  end
 
   defp filter_button_class(true),
     do: "rounded-full bg-indigo-600 px-3 py-1 text-sm font-medium text-white"

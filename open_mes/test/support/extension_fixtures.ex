@@ -3,13 +3,13 @@ defmodule OpenMes.Test.ExtensionFixtures do
   레지스트리/카탈로그 테스트용 가짜 확장 모듈.
 
   실제 확장(EXT-1/EXT-2/애드온)에 의존하지 않고 레지스트리 동작을 검증하기 위해,
-  `OpenMes.Extensions.Extension` behaviour 를 구현한 최소 더미들을 둔다.
+  `OpenMes.Extension` behaviour 를 구현한 최소 더미들을 둔다.
   config `:extensions` 에 이 모듈들을 임시 주입하여 테스트한다.
   """
 
   defmodule EnabledWithScreen do
     @moduledoc "활성 + 화면 있음. 카드에 '열기' 링크가 나와야 함."
-    use OpenMes.Extensions.Definition
+    use OpenMes.Extension.Definition
 
     @impl true
     def id, do: :fixture_enabled_screen
@@ -29,7 +29,7 @@ defmodule OpenMes.Test.ExtensionFixtures do
 
   defmodule EnabledNoScreen do
     @moduledoc "활성 + 화면 없음. '열기' 링크가 없어야 함."
-    use OpenMes.Extensions.Definition
+    use OpenMes.Extension.Definition
 
     @impl true
     def id, do: :fixture_enabled_noscreen
@@ -48,7 +48,7 @@ defmodule OpenMes.Test.ExtensionFixtures do
 
   defmodule DisabledWithScreen do
     @moduledoc "비활성 + 화면 있음. 비활성이므로 '열기' 링크가 없어야 함('비활성' 배지)."
-    use OpenMes.Extensions.Definition
+    use OpenMes.Extension.Definition
 
     @impl true
     def id, do: :fixture_disabled_screen
@@ -68,7 +68,7 @@ defmodule OpenMes.Test.ExtensionFixtures do
 
   defmodule Raising do
     @moduledoc "enabled?/0 가 raise. 레지스트리 safe_enabled? 견고성 검증용(설계 §1.3)."
-    use OpenMes.Extensions.Definition
+    use OpenMes.Extension.Definition
 
     @impl true
     def id, do: :fixture_raising

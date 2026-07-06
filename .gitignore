@@ -26,3 +26,11 @@ build/
 # Logs
 *.log
 
+
+# Elixir build artifacts (root-level, from path deps/umbrella)
+/_build/
+/deps/
+open_mes/_build/
+open_mes/deps/
+*.beam
+erl_crash.dump

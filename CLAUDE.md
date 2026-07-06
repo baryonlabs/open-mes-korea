@@ -172,6 +172,7 @@ fix: correct lot consumption validation
 | 2026-06-14 | AI 종합 조사 환경(시계열+미디어+생산) 구축 — 핵심 차별점 | open_mes/ ai/investigation, ingest, media | Claude가 시계열(EXT-1)+영상미디어(EXT-2)+생산을 단일 context로 종합 조사(Level 1 Read-only, 쓰기 0). /admin/ai/investigate. Provider.investigate(Mock/Claude). mix test 482 passed, AI안전 APPROVED |
 | 2026-06-14 | Claude 모델 ID 최신화 (opus-4-8) | open_mes/ ai/claude_provider | claude-opus-4-5→claude-opus-4-8, ANTHROPIC_MODEL override. 키 설정 시 자동 ClaudeProvider 전환 |
 | 2026-06-14 | RAG 문서영역을 OKF(Open Knowledge Format)로 구현 | open_mes/ knowledge, okf | 표준작업서/매뉴얼/트러블슈팅을 OKF 번들(마크다운+YAML, type 필수, 관용적 소비)로. /admin/settings/knowledge, 번들 export/import(zip), 외부 dep 0. investigate가 설비별 관련 문서 검색·인용(RAG, 근거 referenced_resources). mix test 502 passed, AI안전 APPROVED |
+| 2026-06-15 | 확장 시스템 디커플링 — 외부 repo 확장이 코어 0수정으로 결합 | open_mes_extension_api/(신규 path dep), open_mes/ router·ext.verify·확장8, open_mes_ext_demo/ | 강결합 4지점 해소: router if블록7→`mount_extension_routes()` 매크로(확장은 `route_spec/0` 순수 데이터) / category `atom()` 개방 + `known_categories/0` / ext.verify C7 `module_info(:compile)` 기반·C8 신규 / `open_mes_extension_api` 계약 패키지(Phoenix 미의존) + 자동발견(:auto, extra/exclude/:manual escape hatch, `mix ext.list`). 코어 도메인 미참조 단방향 유지. 기존 8확장 무중단 마이그레이션(phx.routes byte-identical). 외부 데모 확장 deps 1줄 자동노출 실증. mix test 512 passed, ext.verify 9/9, architect(_workspace/30)+qa(31) APPROVED |
 
 ---
 

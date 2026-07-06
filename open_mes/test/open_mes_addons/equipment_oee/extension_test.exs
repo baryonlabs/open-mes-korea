@@ -31,7 +31,7 @@ defmodule OpenMes.Addons.EquipmentOee.ExtensionTest do
         |> Keyword.get_values(:behaviour)
         |> List.flatten()
 
-      assert OpenMes.Extensions.Extension in behaviours
+      assert OpenMes.Extension in behaviours
     end
   end
 

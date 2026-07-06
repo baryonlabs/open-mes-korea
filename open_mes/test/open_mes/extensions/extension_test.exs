@@ -23,14 +23,8 @@ defmodule OpenMes.Extensions.ExtensionTest do
         assert is_binary(mod.name()) and mod.name() != ""
         assert is_binary(mod.description()) and mod.description() != ""
 
-        assert mod.category() in [
-                 :ingest,
-                 :media,
-                 :production,
-                 :quality,
-                 :traceability,
-                 :analytics
-               ]
+        # category 타입은 atom() 으로 개방(설계 30 §2.2) — atom 이기만 하면 유효.
+        assert is_atom(mod.category()) and not is_nil(mod.category())
 
         assert is_binary(mod.version()) and mod.version() != ""
         assert is_boolean(mod.enabled?())
@@ -60,8 +54,8 @@ defmodule OpenMes.Extensions.ExtensionTest do
           |> Keyword.get_values(:behaviour)
           |> List.flatten()
 
-        assert OpenMes.Extensions.Extension in behaviours,
-               "#{inspect(mod)} 는 OpenMes.Extensions.Extension behaviour 를 채택해야 한다"
+        assert OpenMes.Extension in behaviours,
+               "#{inspect(mod)} 는 OpenMes.Extension behaviour 를 채택해야 한다"
       end
     end
   end

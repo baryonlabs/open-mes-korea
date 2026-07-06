@@ -6,7 +6,7 @@ defmodule OpenMes.Addons.CadBom.Extension do
   실제 로직은 `OpenMes.Addons.CadBom`(퍼사드) / `.Parser` / `.Classifier` / `.Csv` 가 담당하고,
   이 모듈은 메타데이터 + 활성 게이트만 노출한다(설계 §1.1).
   """
-  use OpenMes.Extensions.Definition
+  use OpenMes.Extension.Definition
 
   @impl true
   def id, do: :addon_cad_bom
@@ -29,4 +29,17 @@ defmodule OpenMes.Addons.CadBom.Extension do
 
   @impl true
   def home_path, do: "/extensions/cad-bom"
+
+  # 라우트 데이터 선언(설계 30 §2.1) — live 1 + post(다운로드) 1.
+  @impl true
+  def route_spec do
+    %{
+      scope: "/extensions",
+      pipeline: :browser,
+      routes: [
+        {:live, "/cad-bom", OpenMesWeb.Addons.CadBomLive, :index},
+        {:post, "/cad-bom/download", OpenMesWeb.Addons.CadBomController, :download}
+      ]
+    }
+  end
 end

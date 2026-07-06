@@ -10,7 +10,7 @@ defmodule OpenMes.Extensions.RegistryTest do
   """
   use ExUnit.Case, async: false
 
-  alias OpenMes.Extensions.Registry
+  alias OpenMes.Extension.Registry
   alias OpenMes.Test.ExtensionFixtures
   alias OpenMes.Test.ExtensionFixtures.{EnabledWithScreen, Raising}
 

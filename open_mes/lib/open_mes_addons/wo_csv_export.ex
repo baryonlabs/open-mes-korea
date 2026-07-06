@@ -24,6 +24,9 @@ defmodule OpenMes.Addons.WoCsvExport do
       config :open_mes, OpenMes.Addons.WoCsvExport, enabled: true
 
   값이 없으면 기본 false(비활성)로 본다. `*.Extension.enabled?/0` 가 이 함수에 위임한다.
+
+  라우트 게이트 정합: `RouterMount` 매크로가 이 함수를 **컴파일 타임**에 호출하므로(현행
+  `if X.enabled?()` 와 동일 시점), off 면 라우트 테이블에 흔적이 남지 않는다(설계 30 §2.1).
   """
   @spec enabled?() :: boolean()
   def enabled? do

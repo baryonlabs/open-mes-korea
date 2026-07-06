@@ -258,8 +258,9 @@ should first be evaluated as either core behavior or an extension.
 
 ## License
 
-The license has not been finalized. MIT is the leading candidate, and a
-`LICENSE` file and copyright notice will be added before official distribution.
+This project is distributed under the [MIT License](LICENSE).
+
+Copyright (c) 2026 Baryon Labs
 
 ---
 

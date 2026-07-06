@@ -32,6 +32,13 @@ defmodule OpenMes.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # ── 확장 계약 패키지(설계 30 §3) — 형제 디렉토리 path dep ──────────────
+      # 외부 repo 확장이 코어(:open_mes)가 아닌 이 얇은 계약 패키지에만 의존하도록 분리.
+      # 계약 안정화 후 Hex publish 예정({:open_mes_extension_api, "~> 0.1"}).
+      {:open_mes_extension_api, path: "../open_mes_extension_api"},
+      # 외부 repo 확장 증명(설계 30) — deps 이 한 줄만으로 카탈로그·라우트 자동 노출.
+      # 코어 소스(router/config/extension/ext.verify)는 수정하지 않는다. 기본 비활성.
+      {:open_mes_ext_demo, path: "../open_mes_ext_demo"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},

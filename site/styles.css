@@ -448,6 +448,7 @@ svg {
 .ai-section,
 .architecture-section,
 .roadmap-section,
+.showcase-section,
 .prompt-section {
   width: min(calc(100% - 48px), var(--max-width));
   margin: 0 auto;
@@ -762,6 +763,68 @@ svg {
 
 .core-section {
   border-top: 1px solid var(--line);
+}
+
+.showcase-section {
+  padding: 120px 0;
+  border-top: 1px solid var(--line);
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.showcase-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.showcase-frame {
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.18);
+}
+
+.showcase-frame img {
+  display: block;
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.showcase-card figcaption {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.showcase-card figcaption b {
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.showcase-card figcaption span {
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .showcase-frame img {
+    height: auto;
+  }
 }
 
 .section-heading {
