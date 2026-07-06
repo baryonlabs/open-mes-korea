@@ -462,6 +462,51 @@
         </div>
       </section>
 
+      <section class="core-section" id="ssot">
+        <div class="section-heading">
+          <div>
+            <p class="section-label" data-i18n="ssotLabel">API · SINGLE SOURCE OF TRUTH</p>
+            <h2 data-i18n="ssotTitle">각자 에이전트로 조정하고,<br>진실은 한 곳에 모읍니다.</h2>
+          </div>
+          <p data-i18n="ssotDescription">
+            REST API로 각자 에이전트를 만들어 작업지시·BOM을 직접 수정·변경·조정하세요.
+            모든 쓰기에는 actor가 강제되어 감사 로그로 남고, 감사·이벤트 로그·백업이 하나의
+            단일 진실 공급원(SSOT)을 만듭니다. 에이전트가 아무리 많아도 진실은 흩어지지 않습니다.
+          </p>
+        </div>
+
+        <div class="capability-grid">
+          <article>
+            <div class="capability-icon"><svg><use href="#icon-api" /></svg></div>
+            <h3 data-i18n="ssotAgentTitle">API로 만드는 에이전트</h3>
+            <p data-i18n="ssotAgentBody">
+              각자 규칙의 에이전트가 API로 직접 조정. 모든 쓰기에 X-Actor-Id 강제
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon"><svg><use href="#icon-audit" /></svg></div>
+            <h3 data-i18n="ssotAuditTitle">감사·이벤트 로그</h3>
+            <p data-i18n="ssotAuditBody">
+              모든 쓰기를 actor·before·after로 기록하고 표준 이벤트로 발행
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon"><svg><use href="#icon-plug" /></svg></div>
+            <h3 data-i18n="ssotBackupTitle">백업·이식성</h3>
+            <p data-i18n="ssotBackupBody">
+              진실은 PostgreSQL 한 곳 — 표준 백업·스냅샷과 CSV·API 반출, 특정 제품 비종속
+            </p>
+          </article>
+          <article>
+            <div class="capability-icon"><svg><use href="#icon-brain" /></svg></div>
+            <h3 data-i18n="ssotTruthTitle">흩어지지 않는 진실</h3>
+            <p data-i18n="ssotTruthBody">
+              에이전트가 많아도 상태·이력·감사는 MES DB 한 곳으로 모입니다
+            </p>
+          </article>
+        </div>
+      </section>
+
       <section class="architecture-section" id="architecture">
         <div class="section-heading">
           <div>

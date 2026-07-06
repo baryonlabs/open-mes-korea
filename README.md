@@ -312,6 +312,36 @@ AI는 생산 데이터를 임의로 변경하는 운영자가 아닙니다.
 AI는 데이터베이스를 직접 조회하지 않고 AI Context API를 사용합니다.
 생산실적, LOT 소비와 불량 기록은 AI가 직접 삭제할 수 없습니다.
 
+## API로 만드는 나만의 에이전트 · 단일 진실 공급원(SSOT)
+
+Open MES Korea는 **REST API로 열려 있습니다.** 각자 자기 규칙의 에이전트를 만들어
+작업지시를 조회하고, 직접 수정·변경·조정할 수 있습니다. BOM·작업지시 생성 같은 반복 과정을
+에이전트에게 맡기되, 진실은 한 곳에 모읍니다. 핵심 규칙은 하나입니다.
+
+> **모든 쓰기에는 `X-Actor-Id`가 필수이며, 그 값이 그대로 AuditLog에 남습니다.**
+
+사람이 UI로 바꾸든 에이전트가 API로 바꾸든, "누가·언제·무엇을·어떻게(before→after)" 바꿨는지가
+**AuditLog + Event Outbox + PostgreSQL** 한 곳에 축적됩니다. 이것이 **단일 진실 공급원(SSOT)** 입니다.
+
+| 기능 | 무엇을 보장하나 |
+|---|---|
+| **감사(AuditLog)** | 모든 쓰기를 actor·action·before·after로 같은 트랜잭션에 기록 — 역추적 가능 |
+| **이벤트 로그(Event Outbox)** | 상태 변경을 표준 이벤트로 발행 — 외부 연동·재처리의 기준 |
+| **이력성** | 생산실적·LOT·불량은 수정 대신 정정 이력 — 과거가 지워지지 않음 |
+| **백업·이식성** | 진실이 PostgreSQL 한 곳 → 표준 pg 백업/스냅샷 + CSV·API로 반출, 특정 제품 비종속 |
+
+에이전트를 아무리 많이 붙여도 진실은 흩어지지 않습니다. 상태 머신과 actor 강제가
+위험한 변경(임의 전이·무단 삭제)을 막습니다.
+
+**바로 실행되는 예시:** [`examples/agents/work_order_agent.py`](examples/agents/) — 외부 의존성 없이
+작업지시를 조회하고 `X-Actor-Id`로 상태를 전이한 뒤, 그 변경이 감사 로그에 남는 것까지 보여줍니다.
+
+```bash
+BASE_URL=https://openmes-demo.fly.dev ACTOR=agent-release-bot python3 examples/agents/work_order_agent.py
+```
+
+라이브 데모: **https://openmes-demo.fly.dev** (공개 · 매일 초기화)
+
 ## 프로젝트 상태
 
 | 영역 | 상태 |
