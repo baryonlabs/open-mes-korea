@@ -1,5 +1,8 @@
 import Config
 
+# 공개 데모 모드 — 배너/로그인 안내 노출. fly.toml 에서 DEMO_MODE=true.
+config :open_mes, :demo_mode, System.get_env("DEMO_MODE") == "true"
+
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
 # system starts, so it is typically used to load production configuration
@@ -108,8 +111,7 @@ if System.get_env("INGEST_ENABLED") do
   config :open_mes, OpenMes.Ingest,
     enabled: System.get_env("INGEST_ENABLED", "false") == "true",
     sink: OpenMes.Ingest.Sink.NoopSink,
-    device_tokens:
-      System.get_env("INGEST_DEVICE_TOKENS", "") |> String.split(",", trim: true)
+    device_tokens: System.get_env("INGEST_DEVICE_TOKENS", "") |> String.split(",", trim: true)
 end
 
 # ── EXT-2 멀티미디어 (MinIO 필요) ──────────────────────────────────────────
@@ -119,8 +121,7 @@ if System.get_env("MEDIA_ENABLED") do
     object_store: OpenMes.Media.ObjectStore.S3ObjectStore,
     sink: OpenMes.Media.Sink.NoopSink,
     bucket: System.get_env("MEDIA_BUCKET", "open-mes-media"),
-    watch_roots:
-      System.get_env("MEDIA_WATCH_ROOTS", "") |> String.split(",", trim: true)
+    watch_roots: System.get_env("MEDIA_WATCH_ROOTS", "") |> String.split(",", trim: true)
 end
 
 # ── ex_aws (MinIO) 엔드포인트 — 환경변수로 덮어쓰기 ────────────────────────

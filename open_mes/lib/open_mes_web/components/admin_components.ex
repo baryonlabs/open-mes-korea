@@ -180,7 +180,10 @@ defmodule OpenMesWeb.AdminComponents do
               >
                 <span class="flex items-center justify-between gap-1">
                   <span>{item.label}</span>
-                  <.role_dots :if={@admin?} roles={OpenMesWeb.Authorization.roles_for_path(item.path)} />
+                  <.role_dots
+                    :if={@admin?}
+                    roles={OpenMesWeb.Authorization.roles_for_path(item.path)}
+                  />
                 </span>
               </.link>
               <span :if={!item.enabled} class={menu_disabled_class()} title="준비 중">
@@ -274,7 +277,7 @@ defmodule OpenMesWeb.AdminComponents do
           </div>
         </details>
         <.link navigate="/shopfloor" class="text-indigo-600 hover:text-indigo-800">현장 모드 →</.link>
-        <.link navigate="/" class="text-zinc-500 hover:text-zinc-800">홈</.link>
+        <.link href="/logout" method="post" class="text-zinc-500 hover:text-zinc-800">로그아웃</.link>
       </div>
     </header>
     """
@@ -372,7 +375,8 @@ defmodule OpenMesWeb.AdminComponents do
   attr :roles, :list, required: true
 
   def role_dots(assigns) do
-    assigns = assign(assigns, :dots, Enum.map(assigns.roles, &OpenMesWeb.Authorization.role_dot_class/1))
+    assigns =
+      assign(assigns, :dots, Enum.map(assigns.roles, &OpenMesWeb.Authorization.role_dot_class/1))
 
     ~H"""
     <span class="inline-flex items-center gap-0.5" aria-hidden="true">
@@ -419,7 +423,10 @@ defmodule OpenMesWeb.AdminComponents do
   # 진행 흐름 색상: 초기=zinc, 지시/준비=blue, 진행중=indigo, 완료=green, 취소/건너뜀=red/zinc.
   defp status_badge_class(s) when s in ["draft", "pending"], do: "bg-zinc-100 text-zinc-600"
   defp status_badge_class(s) when s in ["released", "ready"], do: "bg-blue-100 text-blue-700"
-  defp status_badge_class(s) when s in ["in_progress", "running"], do: "bg-indigo-100 text-indigo-700"
+
+  defp status_badge_class(s) when s in ["in_progress", "running"],
+    do: "bg-indigo-100 text-indigo-700"
+
   defp status_badge_class("paused"), do: "bg-amber-100 text-amber-700"
   defp status_badge_class("completed"), do: "bg-green-100 text-green-700"
   defp status_badge_class("cancelled"), do: "bg-red-100 text-red-700"

@@ -49,6 +49,11 @@ defmodule OpenMesWeb.Router do
     # 확장 개발 가이드 — 앱 내 자기완결 페이지(외부 URL 의존 0).
     live "/extensions/guide", GuideLive, :index
 
+    # 로그인/로그아웃(데모) — 로그인 페이지에 계정·비밀번호 표시.
+    get "/login", SessionController, :login_page
+    post "/login", SessionController, :login
+    post "/logout", SessionController, :logout
+
     # 데모 역할(role) 전환 — LiveView 가 세션을 못 쓰므로 컨트롤러 경유(설계 §4.4).
     post "/session/role/:role", SessionController, :set_role
   end

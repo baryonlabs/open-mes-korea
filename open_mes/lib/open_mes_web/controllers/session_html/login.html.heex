@@ -1,0 +1,85 @@
+<div class="flex min-h-screen">
+  <%!-- 좌: 큰 현장 이미지 + golden-time 카피(사이트 재사용) --%>
+  <div class="relative hidden lg:block lg:w-3/5">
+    <img
+      src={~p"/images/factory-team.jpg"}
+      alt="현장 작업자가 바코드와 태블릿으로 제조 데이터를 수집하고 분석하는 모습"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10"></div>
+    <div class="absolute bottom-12 left-12 max-w-xl text-white">
+      <p class="text-xs font-semibold tracking-[0.2em] text-amber-300">
+        PRESERVE THE DATA GOLDEN TIME
+      </p>
+      <h2 class="mt-3 text-3xl font-bold leading-snug">
+        벤더를 고르는 동안에도,<br />현장 데이터는 사라집니다.
+      </h2>
+      <p class="mt-4 text-sm leading-relaxed text-white/80">
+        AI 도입의 첫 단계는 제품 비교가 아니라 지금 발생하는 작업·품질·LOT·설비 데이터를 축적하는 일입니다.
+        Open MES Korea로 먼저 수집하고, 실제 데이터가 쌓인 뒤 적합한 분석 도구와 AI를 선택하세요.
+      </p>
+      <ol class="mt-5 flex gap-6 text-sm text-white/90">
+        <li><span class="mr-1 text-amber-300">01</span> <b>지금 데이터 수집</b></li>
+        <li><span class="mr-1 text-amber-300">02</span> <b>이력·품질 확보</b></li>
+        <li><span class="mr-1 text-amber-300">03</span> <b>실제 데이터로 벤더·AI 검증</b></li>
+      </ol>
+    </div>
+  </div>
+
+  <%!-- 우: 로그인 패널 --%>
+  <div class="flex w-full items-center justify-center bg-white px-6 py-12 lg:w-2/5">
+    <div class="w-full max-w-sm">
+      <a href="/" class="flex items-center gap-2">
+        <img src={~p"/images/mark.svg"} width="34" height="34" alt="" />
+        <span class="text-lg font-bold text-zinc-900">Open MES Korea</span>
+      </a>
+
+      <h1 class="mt-10 text-2xl font-bold text-zinc-900">로그인</h1>
+      <p class="mt-1 text-sm leading-relaxed text-zinc-500">
+        공개 데모입니다. 아래 계정을 클릭하면 해당 역할로 바로 로그인됩니다.
+        누구나 열람·편집할 수 있으며 데이터는 매일 초기화됩니다.
+      </p>
+
+      <p
+        :if={Phoenix.Flash.get(@flash, :error)}
+        class="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
+      >
+        {Phoenix.Flash.get(@flash, :error)}
+      </p>
+
+      <%!-- 역할별 계정 원클릭 로그인 --%>
+      <div class="mt-6 space-y-2">
+        <.form
+          :for={{code, name, role} <- @accounts}
+          for={to_form(%{})}
+          action={~p"/login"}
+          method="post"
+        >
+          <input type="hidden" name="worker_code" value={code} />
+          <input type="hidden" name="password" value={@demo_password} />
+          <button class="flex w-full items-center justify-between rounded-lg border border-zinc-200 px-4 py-2.5 text-left transition hover:border-amber-400 hover:bg-amber-50">
+            <span>
+              <span class="font-medium text-zinc-800">{name}</span>
+              <span class="ml-2 font-mono text-xs text-zinc-400">{code}</span>
+            </span>
+            <span class="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+              {OpenMesWeb.Authorization.role_label(role)}
+            </span>
+          </button>
+        </.form>
+      </div>
+
+      <div class="mt-6 rounded-lg bg-zinc-50 px-4 py-3 text-xs text-zinc-500">
+        데모 비밀번호 <code class="font-mono font-semibold text-zinc-800">{@demo_password}</code>
+        · 모든 계정 공용 · 직접 입력할 필요 없이 위 계정을 클릭하세요.
+      </div>
+
+      <p class="mt-8 text-center text-xs text-zinc-400">
+        <a href="https://github.com/baryonlabs/open-mes-korea" class="underline hover:text-zinc-600">
+          GitHub
+        </a>
+        · Open MES Korea — MIT License
+      </p>
+    </div>
+  </div>
+</div>

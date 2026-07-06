@@ -10,6 +10,8 @@ primary_region = "nrt"
   PHX_HOST = "openmes-demo.fly.dev"
   PORT = "8080"
   PHX_SERVER = "true"
+  # 공개 데모 — 배너/로그인 안내 노출
+  DEMO_MODE = "true"
   # Fly Postgres 는 .flycast(IPv6) 주소 → Ecto 소켓 IPv6 필요
   ECTO_IPV6 = "true"
   # 데모 단일 머신 — 저메모리이므로 DB 풀 작게

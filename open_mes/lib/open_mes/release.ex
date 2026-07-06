@@ -37,6 +37,35 @@ defmodule OpenMes.Release do
     end
   end
 
+  @doc """
+  데모 초기화: 도메인 데이터 전부 삭제 후 시드 재적재(공개 데모용).
+
+  인증 없는 공개 데모라 누구나 추가/삭제한다. 정기적으로(예: fly 스케줄 머신 하루 1회)
+  이 함수를 실행해 깨끗한 시드 상태로 되돌린다. `schema_migrations` 는 보존한다.
+
+  `bin/open_mes eval 'OpenMes.Release.reset_demo()'` (PHX_SERVER 언셋 권장 — non-serving).
+  """
+  def reset_demo do
+    load_app()
+    {:ok, _} = Application.ensure_all_started(@app)
+    repo = List.first(repos())
+
+    {:ok, %{rows: rows}} =
+      repo.query(
+        "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename <> 'schema_migrations'"
+      )
+
+    tables = rows |> List.flatten() |> Enum.map_join(", ", &~s("#{&1}"))
+
+    if tables != "" do
+      repo.query!("TRUNCATE TABLE #{tables} RESTART IDENTITY CASCADE")
+    end
+
+    path = Application.app_dir(@app, "priv/repo/seeds.exs")
+    if File.exists?(path), do: Code.eval_file(path)
+    IO.puts("[reset_demo] 도메인 데이터 초기화 + 시드 재적재 완료")
+  end
+
   defp repos do
     Application.fetch_env!(@app, :ecto_repos)
   end
