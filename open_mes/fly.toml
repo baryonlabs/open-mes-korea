@@ -1,0 +1,32 @@
+# Open MES Korea 데모 — fly.io 저비용 배포
+# 앱: shared-cpu-1x / 512MB, 유휴 시 0대로 스케일(min_machines_running=0)
+# DB: 별도 Fly Postgres(최소) 를 attach 하여 DATABASE_URL 주입
+app = "openmes-demo"
+primary_region = "nrt"
+
+[build]
+
+[env]
+  PHX_HOST = "openmes-demo.fly.dev"
+  PORT = "8080"
+  PHX_SERVER = "true"
+  # Fly Postgres 는 .flycast(IPv6) 주소 → Ecto 소켓 IPv6 필요
+  ECTO_IPV6 = "true"
+  # 데모 단일 머신 — 저메모리이므로 DB 풀 작게
+  POOL_SIZE = "5"
+
+[deploy]
+  # 배포마다 마이그레이션(멱등). 시드는 최초 1회 수동(Release.seed).
+  release_command = "/app/bin/migrate"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
